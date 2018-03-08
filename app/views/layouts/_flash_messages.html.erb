@@ -1,5 +1,4 @@
-:plain
-  <% content_for :javascript do %>
+<% content_for :javascript do %>
   <script type="text/javascript">
     var eventName = typeof(Turbolinks) !== 'undefined' ? 'turbolinks:load' : 'DOMContentLoaded';
 
@@ -15,4 +14,4 @@
       document.removeEventListener(eventName, flash)
     });
   </script>
-  <% end %>
+<% end %>
