@@ -10,7 +10,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180308042818) do
+ActiveRecord::Schema.define(version: 20180309072724) do
+
+  create_table "product_variants", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "product_id"
+    t.string "remote_id"
+    t.string "title"
+    t.decimal "price", precision: 10
+    t.decimal "compare_at_price", precision: 10
+    t.string "sku"
+    t.integer "position"
+    t.integer "grams"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_product_variants_on_product_id"
+  end
+
+  create_table "products", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "remote_id"
+    t.string "title"
+    t.text "body_html"
+    t.string "vendor"
+    t.string "product_type"
+    t.string "handle"
+    t.string "published_scope"
+    t.text "tags"
+    t.text "featured_image_url"
+    t.decimal "price_min", precision: 10, scale: 2
+    t.decimal "compare_price_min", precision: 10, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "shops", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "shopify_domain", null: false
@@ -20,4 +50,28 @@ ActiveRecord::Schema.define(version: 20180308042818) do
     t.index ["shopify_domain"], name: "index_shops_on_shopify_domain", unique: true
   end
 
+  create_table "wishlist_items", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "wishlist_id"
+    t.string "shopify_product_id"
+    t.string "shopify_variant_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["wishlist_id"], name: "index_wishlist_items_on_wishlist_id"
+  end
+
+  create_table "wishlists", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "shop_id"
+    t.string "name"
+    t.string "token"
+    t.string "wishlist_type"
+    t.string "shopify_customer_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["shop_id"], name: "index_wishlists_on_shop_id"
+    t.index ["token"], name: "index_wishlists_on_token"
+  end
+
+  add_foreign_key "product_variants", "products"
+  add_foreign_key "wishlist_items", "wishlists"
+  add_foreign_key "wishlists", "shops"
 end
