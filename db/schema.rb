@@ -21,12 +21,15 @@ ActiveRecord::Schema.define(version: 20180309072724) do
     t.string "sku"
     t.integer "position"
     t.integer "grams"
+    t.integer "inventory_quantity"
+    t.string "inventory_policy"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["product_id"], name: "index_product_variants_on_product_id"
   end
 
   create_table "products", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "shop_id"
     t.string "remote_id"
     t.string "title"
     t.text "body_html"
@@ -38,8 +41,10 @@ ActiveRecord::Schema.define(version: 20180309072724) do
     t.text "featured_image_url"
     t.decimal "price_min", precision: 10, scale: 2
     t.decimal "compare_price_min", precision: 10, scale: 2
+    t.boolean "available"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["shop_id"], name: "index_products_on_shop_id"
   end
 
   create_table "shops", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -72,6 +77,7 @@ ActiveRecord::Schema.define(version: 20180309072724) do
   end
 
   add_foreign_key "product_variants", "products"
+  add_foreign_key "products", "shops"
   add_foreign_key "wishlist_items", "wishlists"
   add_foreign_key "wishlists", "shops"
 end
