@@ -10,6 +10,6 @@ class SerializableProduct < JSONAPI::Serializable::Resource
 
   attribute :default_variant_id do
     variant = @object.product_variants.sort_by(&:position).first
-    variant.id
+    variant.remote_id
   end
 end
