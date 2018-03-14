@@ -1,6 +1,6 @@
-role :web, 'deployer@45.76.166.50'
-role :db,  'deployer@45.76.166.50'
-role :app, 'deployer@45.76.166.50'
+role :web, 'deployer@159.65.242.196'
+role :db,  'deployer@159.65.242.196'
+role :app, 'deployer@159.65.242.196'
 
 set :rail_env, :staging
 
