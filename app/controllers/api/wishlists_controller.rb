@@ -4,7 +4,7 @@ class Api::WishlistsController < ApiController
     wishlist = creator.call
 
     if creator.errors.blank?
-      render json: wishlist
+      render jsonapi: wishlist, include: [:wishlist_items]
     else
       render json: creator.errors, status: 400
     end
@@ -14,7 +14,7 @@ class Api::WishlistsController < ApiController
     wishlist = Wishlist.find_by(token: params[:id])
 
     if wishlist.update(wishlist_params)
-      render json: wishlist
+      render jsonapi: wishlist, include: [:wishlist_items]
     else
       render json: wishlist.errors, status: 400
     end
