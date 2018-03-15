@@ -31,9 +31,12 @@ class Api::WishlistsController < ApiController
   private
 
   def dynamic_params
-    params.permit!.merge({
+    {
       shop: Shop.find_by(shopify_domain: params[:shop]),
-    })
+      customer_id: params[:customer_id],
+      form_type: params[:form_type],
+      product_ids: params[:product_ids]
+    }
   end
 
   def wishlist_params
