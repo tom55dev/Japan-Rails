@@ -40,7 +40,7 @@ class Api::WishlistsController < ApiController
   def add_product
     wishlist = find_wishlist
 
-    item = wishlist.wishlist_items.create(product_id: params[:product_id])
+    item = wishlist.wishlist_items.create(product: product)
 
     if item.persisted?
       render jsonapi: wishlist
@@ -51,7 +51,7 @@ class Api::WishlistsController < ApiController
 
   def remove_product
     wishlist = find_wishlist
-    item = wishlist.wishlist_items.find_by(product_id: params[:product_id])
+    item = wishlist.wishlist_items.find_by(product: product)
 
     item.destroy
 
