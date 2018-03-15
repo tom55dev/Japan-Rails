@@ -6,8 +6,12 @@ class ApiController < ActionController::API
   def valid_request?
     whitelisted = Rails.application.secrets.whitelisted_domains
 
-    unless request.origin.present? && whitelisted.include?(URI.parse(request.origin).host)
+    unless Rails.env.development? || (request.origin.present? && whitelisted.include?(URI.parse(request.origin).host))
       render json: { msg: 'Sorry, you don\'t have any access to this websote.' }, status: 403
     end
+  end
+
+  def current_shop
+    @current_shop ||= Shop.find_by(shopify_domain: params[:shop])
   end
 end

@@ -1,4 +1,12 @@
 class Api::WishlistsController < ApiController
+  def index
+    wishlists = current_shop.wishlists.where(shopify_customer_id: params[:customer_id])
+                                      .includes(:wishlist_items)
+                                      .order(created_at: :desc)
+
+    render jsonapi: wishlists, include: [:wishlist_items]
+  end
+
   def create
     creator = WishlistCreator.new(dynamic_params)
     wishlist = creator.call
@@ -11,7 +19,7 @@ class Api::WishlistsController < ApiController
   end
 
   def update
-    wishlist = Wishlist.find_by(token: params[:id])
+    wishlist = current_shop.wishlists.find_by(token: params[:id])
 
     if wishlist.update(wishlist_params)
       render jsonapi: wishlist, include: [:wishlist_items]
@@ -21,7 +29,7 @@ class Api::WishlistsController < ApiController
   end
 
   def destroy
-    wishlist = Wishlist.find_by(token: params[:id])
+    wishlist = current_shop.wishlists.find_by(token: params[:id])
 
     wishlist.destroy
 
@@ -32,7 +40,7 @@ class Api::WishlistsController < ApiController
 
   def dynamic_params
     {
-      shop: Shop.find_by(shopify_domain: params[:shop]),
+      shop: current_shop,
       customer_id: params[:customer_id],
       form_type: params[:form_type],
       product_ids: params[:product_ids]
