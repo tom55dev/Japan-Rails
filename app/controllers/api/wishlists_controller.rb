@@ -50,6 +50,7 @@ class Api::WishlistsController < ApiController
   end
 
   def remove_product
+    wishlist = find_wishlist
     item = wishlist.wishlist_items.find_by(product_id: params[:product_id])
 
     item.destroy
