@@ -9,7 +9,7 @@ class ApiController < ActionController::API
     unless Rails.env.development? || (current_shop.present?
                                       && request.origin.present?
                                       && whitelisted.include?(URI.parse(request.origin).host))
-      render json: { msg: 'Sorry, you don\'t have any access to this websote.' }, status: 403
+      render json: { msg: 'Sorry, you don\'t have any access to this website.' }, status: 403
     end
   end
 
