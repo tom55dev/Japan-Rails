@@ -6,13 +6,22 @@ class Api::WishlistItemsController < ApiController
   #   product_id: '123123'
   # }
   def create
-    item = WishlistItem.add(wishlist, params[:product_id])
+    wishlist = find_wishlist
 
-    render json: item
+    item = wishlist.wishlist_items.create(product_id: params[:product_id])
+
+    if item.persisted?
+      render json: { token: wishlist.token }
+    else
+      render json: item.errors, status: 400
+    end
   end
 
   def destroy
-    item = WishlistItem.remove(wishlist, params[:product_id])
+    item = wishlist.wishlist_items.find_by(product_id: params[:product_id])
+
+    item.destroy
+
     render json: item
   end
 
@@ -22,16 +31,18 @@ class Api::WishlistItemsController < ApiController
     @product ||= ShopifyAPI::Product.find(params[:wishlist_item][:product_id])
   end
 
-  def wishlist
-    shop.wishlists.find_or_create(wishlist_params)
+  def find_wishlist
+    model = shop.wishlists.find_by(token: params[:token])
+
+    model = create_wishlist if model.blank?
+    model
   end
 
   def wishlist_params
-    {
-      token: params[:id],
+    Wishlist.create({
       shopify_customer_id: params[:customer_id],
       name: product.title, # default
       wishlist_type: 'private', # default
-    }
+    })
   end
 end
