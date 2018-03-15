@@ -26,7 +26,7 @@ class Api::WishlistItemsController < ApiController
   end
 
   def find_wishlist
-    model = current_shop.wishlists.find_by(token: params[:token])
+    model = current_shop.wishlists.find_by(token: params[:wishlist_id])
 
     model = create_wishlist if model.blank?
     model
