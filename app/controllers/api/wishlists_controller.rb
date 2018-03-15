@@ -1,10 +1,10 @@
 class Api::WishlistsController < ApiController
   def index
     wishlists = current_shop.wishlists.where(shopify_customer_id: params[:customer_id])
-                                      .includes(:wishlist_items)
+                                      .includes(:products)
                                       .order(created_at: :desc)
 
-    render jsonapi: wishlists, include: [:wishlist_items]
+    render jsonapi: wishlists
   end
 
   def create

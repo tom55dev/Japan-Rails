@@ -9,5 +9,7 @@ class SerializableWishlist < JSONAPI::Serializable::Resource
     @object.shopify_customer_id
   end
 
-  has_many :wishlist_items
+  attribute :product_ids do
+    @object.product_ids
+  end
 end

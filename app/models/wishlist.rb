@@ -2,6 +2,7 @@ class Wishlist < ApplicationRecord
   belongs_to :shop
 
   has_many :wishlist_items, dependent: :destroy
+  has_many :products, through: :wishlist_items
 
   validates :name, :token, :wishlist_type, :shopify_customer_id, presence: true
 
