@@ -10,6 +10,6 @@ class SerializableWishlist < JSONAPI::Serializable::Resource
   end
 
   attribute :product_ids do
-    @object.product_ids
+    @object.products.map(&:remote_id)
   end
 end
