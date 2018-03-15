@@ -36,6 +36,27 @@ class Api::WishlistsController < ApiController
     render json: 'ok', status: 200
   end
 
+  # Wishlist Items
+  def add_product
+    wishlist = find_wishlist
+
+    item = wishlist.wishlist_items.create(product_id: params[:product_id])
+
+    if item.persisted?
+      render jsonapi: wishlist
+    else
+      render json: item.errors, status: 400
+    end
+  end
+
+  def remove_product
+    item = wishlist.wishlist_items.find_by(product_id: params[:product_id])
+
+    item.destroy
+
+    render json: item
+  end
+
   private
 
   def dynamic_params
@@ -49,5 +70,24 @@ class Api::WishlistsController < ApiController
 
   def wishlist_params
     params.require(:wishlist).permit(:name, :wishlist_type)
+  end
+
+  def find_wishlist
+    model = current_shop.wishlists.find_by(token: params[:id])
+
+    model = create_wishlist if model.blank?
+    model
+  end
+
+  def wishlist_params
+    Wishlist.create({
+      shopify_customer_id: params[:customer_id],
+      name: product.title, # default
+      wishlist_type: 'private', # default
+    })
+  end
+
+  def product
+    @product ||= Product.find_by(remote_id: params[:product_id])
   end
 end
