@@ -94,4 +94,8 @@ class Api::WishlistsController < ApiController
     creator = WishlsitCreator.new(dynamic_params)
     creator.call
   end
+
+  def product
+    @product ||= Product.find_by(remote_id: params[:product_id])
+  end
 end
