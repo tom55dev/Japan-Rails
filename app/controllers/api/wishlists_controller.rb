@@ -73,7 +73,9 @@ class Api::WishlistsController < ApiController
       shop: current_shop,
       customer_id: params[:customer_id],
       form_type: params[:form_type],
-      product_ids: params[:product_ids]
+      product_ids: params[:product_ids],
+      name: params[:wishlist] && params[:wishlist][:name],
+      wishlist_type: params[:wishlist] && params[:wishlist][:wishlist_type]
     }
   end
 
@@ -88,15 +90,8 @@ class Api::WishlistsController < ApiController
     model
   end
 
-  def wishlist_params
-    Wishlist.create({
-      shopify_customer_id: params[:customer_id],
-      name: product.title, # default
-      wishlist_type: 'private', # default
-    })
-  end
-
-  def product
-    @product ||= Product.find_by(remote_id: params[:product_id])
+  def create_wishlist
+    creator = WishlsitCreator.new(dynamic_params)
+    creator.call
   end
 end
