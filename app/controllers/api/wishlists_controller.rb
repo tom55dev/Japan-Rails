@@ -12,7 +12,7 @@ class Api::WishlistsController < ApiController
     wishlist = creator.call
 
     if creator.errors.blank?
-      render jsonapi: wishlist, include: [:wishlist_items]
+      render jsonapi: wishlist
     else
       render json: creator.errors, status: 400
     end
@@ -22,9 +22,17 @@ class Api::WishlistsController < ApiController
     wishlist = current_shop.wishlists.find_by(token: params[:id])
 
     if wishlist.update(wishlist_params)
-      render jsonapi: wishlist, include: [:wishlist_items]
+      render jsonapi: wishlist
     else
       render json: wishlist.errors, status: 400
+    end
+  end
+
+  def show
+    if params[:id] == 'latest'
+      render jsonapi: current_shop.wishlists.order(created_at: :desc).first
+    else
+      render jsonapi: current_shop.wishlists.find_by(token: params[:id])
     end
   end
 
