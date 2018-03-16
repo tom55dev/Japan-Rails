@@ -46,8 +46,7 @@ class Api::WishlistsController < ApiController
 
   # Wishlist Items
   def add_product
-    wishlist = find_wishlist
-
+    wishlist = current_wishlist
     item = wishlist.wishlist_items.create(product: product)
 
     if item.persisted?
@@ -58,7 +57,7 @@ class Api::WishlistsController < ApiController
   end
 
   def remove_product
-    wishlist = find_wishlist
+    wishlist = current_wishlist
     item = wishlist.wishlist_items.find_by(product: product)
 
     item.destroy
@@ -83,16 +82,8 @@ class Api::WishlistsController < ApiController
     params.require(:wishlist).permit(:name, :wishlist_type)
   end
 
-  def find_wishlist
-    model = current_shop.wishlists.find_by(token: params[:id])
-
-    model = create_wishlist if model.blank?
-    model
-  end
-
-  def create_wishlist
-    creator = WishlsitCreator.new(dynamic_params)
-    creator.call
+  def current_wishlist
+    @current_wishlist ||= current_shop.wishlists.find_by(token: params[:id])
   end
 
   def product
