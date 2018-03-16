@@ -74,8 +74,8 @@ class Api::WishlistsController < ApiController
       customer_id: params[:customer_id],
       form_type: params[:form_type],
       product_ids: params[:product_ids],
-      name: params[:wishlist] && params[:wishlist][:name],
-      wishlist_type: params[:wishlist] && params[:wishlist][:wishlist_type]
+      name: params[:name]
+      wishlist_type: params[:wishlist_type]
     }
   end
 
