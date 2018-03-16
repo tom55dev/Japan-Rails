@@ -62,7 +62,7 @@ class Api::WishlistsController < ApiController
 
     item.destroy
 
-    render json: item
+    render jsonapi: wishlist
   end
 
   private
