@@ -28,17 +28,20 @@ class WishlistCreator
 
   def wishlist_params
     {
-      name: auto? ? 'My Private Wishlist' : name,
+      name: auto? ? products.first.title : name,
       wishlist_type: auto? ? 'private' : wishlist_type,
       shopify_customer_id: customer_id
     }
   end
 
   def wishlist_items_params
-    products = Product.where(remote_id: product_ids)
     products.map do |product|
       { product_id: product.id }
     end
+  end
+
+  def products
+    @products ||= Product.where(remote_id: product_ids)
   end
 
   def auto?
