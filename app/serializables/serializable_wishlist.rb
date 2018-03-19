@@ -3,7 +3,7 @@ class SerializableWishlist < JSONAPI::Serializable::Resource
 
   id { @object.token }
 
-  attributes :name, :wishlist_type
+  attributes :name, :wishlist_type, :updated_at
 
   attribute :customer_id do
     @object.shopify_customer_id
