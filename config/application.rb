@@ -36,5 +36,7 @@ module JapanhaulRails
         resource '*', :headers => :any, :methods => [:get, :post, :delete, :put, :options]
       end
     end
+
+    config.time_zone = 'Tokyo'
   end
 end
