@@ -1,8 +1,7 @@
 class Api::WishlistsController < ApiController
   def index
-    wishlists = current_shop.wishlists.where(shopify_customer_id: params[:customer_id])
-                                      .includes(:products)
-                                      .order(created_at: :desc)
+    wishlists = filter_wishlists.includes(:products)
+                                .order(created_at: :desc)
 
     render jsonapi: wishlists
   end
@@ -19,7 +18,7 @@ class Api::WishlistsController < ApiController
   end
 
   def update
-    wishlist = current_shop.wishlists.find_by(token: params[:id])
+    wishlist = filter_wishlists.find_by(token: params[:id])
 
     if wishlist.update(wishlist_params)
       render jsonapi: wishlist
@@ -30,14 +29,14 @@ class Api::WishlistsController < ApiController
 
   def show
     if params[:id] == 'latest'
-      render jsonapi: current_shop.wishlists.order(created_at: :desc).first
+      render jsonapi: filter_wishlists.order(created_at: :desc).first
     else
-      render jsonapi: current_shop.wishlists.find_by(token: params[:id])
+      render jsonapi: filter_wishlists.find_by(token: params[:id])
     end
   end
 
   def destroy
-    wishlist = current_shop.wishlists.find_by(token: params[:id])
+    wishlist = filter_wishlists.find_by(token: params[:id])
 
     wishlist.destroy
 
@@ -50,6 +49,7 @@ class Api::WishlistsController < ApiController
     item = current_wishlist.wishlist_items.create(product: product)
 
     if item.persisted?
+      current_wishlist.update(updated_at: Time.zone.now)
       render jsonapi: wishlist
     else
       render json: item.errors, status: 400
@@ -59,6 +59,7 @@ class Api::WishlistsController < ApiController
   def remove_product
     wishlist = current_wishlist
     item = current_wishlist.wishlist_items.find_by(product: product)
+    current_wishlist.update(updated_at: Time.zone.now)
 
     item.destroy
 
@@ -82,8 +83,12 @@ class Api::WishlistsController < ApiController
     params.require(:wishlist).permit(:name, :wishlist_type)
   end
 
+  def filter_wishlists
+    current_shop.wishlists.where(shopify_customer_id: params[:customer_id])
+  end
+
   def current_wishlist
-    @current_wishlist ||= current_shop.wishlists.find_by(token: params[:id])
+    @current_wishlist ||= filter_wishlists.find_by(token: params[:id])
   end
 
   def product
