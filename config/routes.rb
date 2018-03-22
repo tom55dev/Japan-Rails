@@ -3,8 +3,15 @@ Rails.application.routes.draw do
 
   namespace :api do
     resources :wishlists do
-      resources :wishlist_items, path: 'items'
+      member do
+        post   :add_product
+        delete :remove_product
+      end
     end
+
+    resources :wishlist_pages, only: [:show]
+
+    resources :products, only: [:index]
   end
 
   root :to => 'home#index'
