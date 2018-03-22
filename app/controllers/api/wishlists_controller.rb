@@ -40,7 +40,7 @@ class Api::WishlistsController < ApiController
 
     wishlist.destroy
 
-    render json: 'ok', status: 200
+    render json: 'ok', status: 204
   end
 
   # Wishlist Items
