@@ -21,6 +21,13 @@ describe WishlistCreator do
     }
   end
 
+  before do
+    json = JSON.parse File.read('spec/fixtures/shopify_customer.json')
+    object = ShopifyAPI::Customer.new(customer: json)
+
+    allow(ShopifyAPI::Customer).to receive(:find).and_return(object)
+  end
+
   describe '#call' do
     context 'form_type is manual' do
       it 'creates the wishlist' do

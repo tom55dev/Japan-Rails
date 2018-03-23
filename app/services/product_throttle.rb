@@ -12,6 +12,14 @@ class ProductThrottle
   end
 
   def call
+    shop.with_shopify_session do
+      execute!
+    end
+  end
+
+  private
+
+  def execute!
     # Initializing
     start_time = Time.now
 
@@ -35,8 +43,6 @@ class ProductThrottle
       sync_products(products)
     end
   end
-
-  private
 
   def sync_products(products)
     products.each do |product|

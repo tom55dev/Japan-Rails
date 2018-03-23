@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory :wishlist do
     shop { create :shop }
+    customer { create :customer }
     name 'My Private Wishlist'
     wishlist_type 'private'
-    shopify_customer_id '123123'
   end
 end

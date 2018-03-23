@@ -30,7 +30,7 @@ class WishlistCreator
     {
       name: auto? ? products.first.title : name,
       wishlist_type: auto? ? 'private' : wishlist_type,
-      shopify_customer_id: customer_id
+      customer: customer
     }
   end
 
@@ -50,5 +50,9 @@ class WishlistCreator
 
   def manual?
     form_type == 'manual'
+  end
+
+  def customer
+    CustomerSync.new(shop, customer_id).call
   end
 end
