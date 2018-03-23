@@ -9,7 +9,9 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :wishlist_pages, only: [:show]
+    resources :wishlist_pages, only: [:show] do
+      get :product, on: :collection
+    end
 
     resources :products, only: [:index]
   end
