@@ -35,7 +35,8 @@ class Api::WishlistPagesController < ApiController
 
   def set_wishlist
     if params[:customer_id].present?
-      @wishlist = current_shop.wishlists.joins(:customer).distinct.where(customers: { remote_id: params[:customer_id] }).find_by(wishlists: { token: params[:id] })
+      @wishlist = current_shop.wishlists.find_by(token: params[:id])
+      @wishlist = nil if @wishlist.wishlist_type == 'private' && @wishlist.customer.remote_id != params[:customer_id]
     else
       @wishlist = current_shop.wishlists.where(wishlist_type: 'public').find_by(token: params[:id])
     end
