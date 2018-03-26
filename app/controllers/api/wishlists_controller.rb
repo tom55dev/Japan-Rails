@@ -84,7 +84,7 @@ class Api::WishlistsController < ApiController
   end
 
   def filter_wishlists
-    current_shop.wishlists.where(shopify_customer_id: params[:customer_id])
+    current_shop.wishlists.joins(:customer).where(customers: { remote_id: params[:customer_id] }).distinct
   end
 
   def current_wishlist

@@ -9,6 +9,10 @@ describe ProductSync do
     )
   end
 
+  after do
+    ShopifyAPI::Base.clear_session
+  end
+
   let!(:product_json) { JSON.parse(File.read('spec/fixtures/shopify_product.json')) }
   let!(:shopify_product) { ShopifyAPI::Product.new(product: product_json) }
 

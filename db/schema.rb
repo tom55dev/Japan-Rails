@@ -10,7 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180315035305) do
+ActiveRecord::Schema.define(version: 20180323014102) do
+
+  create_table "customers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "shop_id"
+    t.string "remote_id"
+    t.string "email"
+    t.string "first_name"
+    t.string "last_name"
+    t.integer "orders_count"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["remote_id"], name: "index_customers_on_remote_id"
+    t.index ["shop_id"], name: "index_customers_on_shop_id"
+  end
 
   create_table "product_variants", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "product_id"
@@ -71,16 +84,19 @@ ActiveRecord::Schema.define(version: 20180315035305) do
     t.string "name"
     t.string "token"
     t.string "wishlist_type"
-    t.string "shopify_customer_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "customer_id"
+    t.index ["customer_id"], name: "index_wishlists_on_customer_id"
     t.index ["shop_id"], name: "index_wishlists_on_shop_id"
     t.index ["token"], name: "index_wishlists_on_token"
   end
 
+  add_foreign_key "customers", "shops"
   add_foreign_key "product_variants", "products"
   add_foreign_key "products", "shops"
   add_foreign_key "wishlist_items", "products"
   add_foreign_key "wishlist_items", "wishlists"
+  add_foreign_key "wishlists", "customers"
   add_foreign_key "wishlists", "shops"
 end

@@ -6,7 +6,7 @@ class SerializableWishlist < JSONAPI::Serializable::Resource
   attributes :name, :wishlist_type, :updated_at
 
   attribute :customer_id do
-    @object.shopify_customer_id
+    @object.customer.remote_id
   end
 
   attribute :product_ids do
