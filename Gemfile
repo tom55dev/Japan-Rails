@@ -21,6 +21,8 @@ gem 'uglifier', '>= 1.3.0'
 
 # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
 gem 'jbuilder', '~> 2.5'
+
+gem 'jquery-rails'
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 3.0'
 # Use ActiveModel has_secure_password
@@ -65,6 +67,12 @@ group :development do
   gem 'capistrano-rvm', require: false
   gem 'capistrano3-puma', '1.2.1', require: false
   gem 'capistrano-sidekiq', require: false
+end
+
+source 'http://rails-assets.org' do
+  gem 'rails-assets-bootstrap'
+  gem 'rails-assets-selectize'
+  gem 'rails-assets-onmount'
 end
 
 # HAML integration

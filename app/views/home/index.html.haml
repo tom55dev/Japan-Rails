@@ -5,4 +5,16 @@
     });
 
 .special-offer
-  %h2 Special Offer
+  %h2
+    Special Offer
+  - if current_shop.special_offer.blank?
+    %p No product selected.
+  - else
+    %p
+      = image_tag current_shop.special_offer.product.featured_image_url, width: '70'
+      = current_shop.special_offer.product.title
+    %p
+      until
+      %strong #{current_shop.special_offer.ends_at.strftime('%d %B %Y %H:%M:%S %Z')}
+
+  = link_to 'Edit', edit_special_offer_path

@@ -74,6 +74,7 @@ ActiveRecord::Schema.define(version: 20180326051650) do
     t.bigint "shop_id"
     t.bigint "product_id"
     t.datetime "ends_at"
+    t.string "metafield_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["product_id"], name: "index_special_offers_on_product_id"

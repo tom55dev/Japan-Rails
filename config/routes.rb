@@ -16,7 +16,9 @@ Rails.application.routes.draw do
     resources :products, only: [:index]
   end
 
-  resources :special_offers
+  resource :special_offer, only: [:edit, :update] do
+    get :search
+  end
 
   root :to => 'home#index'
 

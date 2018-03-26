@@ -10,9 +10,9 @@
   %body
     .app-wrapper
       .app-content
-        %main{:role => "main"}
+        %main.container-fluid{:role => "main"}
+          = render 'layouts/flash_messages'
           = yield
-    = render 'layouts/flash_messages'
     %script{ src: "https://cdn.shopify.com/s/assets/external/app.js?#{Time.now.strftime('%Y%m%d%H')}"}
     :javascript
       ShopifyApp.init({
