@@ -16,6 +16,8 @@ Rails.application.routes.draw do
     resources :products, only: [:index]
   end
 
+  resources :special_offers
+
   root :to => 'home#index'
 
   mount ShopifyApp::Engine, at: '/'
