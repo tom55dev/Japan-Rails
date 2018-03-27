@@ -5,7 +5,7 @@ set :stages, %w[production staging]
 
 set :application, 'japanhaul-rails'
 set :repo_url, 'git@github.com:movefast-llc/japanhaul-rails.git'
-set :branch, 'feature/wishlists-api'
+set :branch, 'master'
 
 set :user, 'deployer'
 set :deploy_to, "/data/#{fetch(:application)}"
