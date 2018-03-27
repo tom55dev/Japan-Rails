@@ -1,0 +1,18 @@
+.row
+  .col-sm-6
+    %h2 Special Offer
+    = form_for @special_offer, url: special_offer_path, method: :patch do |f|
+      - if @special_offer.errors.any?
+        .alert.alert-danger
+          = @special_offer.errors.full_messages.to_sentence
+
+      .form-group
+        = f.label :product_id
+        = f.select :product_id, [], {}, data: { toggle: 'special-offer', product: @special_offer.try(:product).try(:as_json, only: [:id, :title]) }
+      .form-group
+        = f.label :ends_at, 'Ends At *JST*'
+        = f.datetime_field :ends_at, class: 'form-control'
+      .form-group
+        = link_to 'Go Back', root_path
+        |
+        = f.submit 'Save', class: 'btn btn-primary', data: { disable_with: 'Saving...' }

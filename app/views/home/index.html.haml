@@ -3,17 +3,18 @@
     ShopifyApp.ready(function(){
       ShopifyApp.Bar.initialize({ title: "Home" });
     });
-%h2 Products
-%ul
-  - @products.each do |product|
-    %li= link_to product.title, "https://#{@shop_session.url}/admin/products/#{product.id}", target: "_top"
-%hr/
-%h2 Webhooks
-- if @webhooks.present?
-  %ul
-    - @webhooks.each do |webhook|
-      %li
-        = webhook.topic
-        \: #{webhook.address}
-- else
-  %p This app has not created any webhooks for this Shop. Add webhooks to your ShopifyApp initializer if you need webhooks
+
+.special-offer
+  %h2
+    Special Offer
+  - if current_shop.special_offer.blank?
+    %p No product selected.
+  - else
+    %p
+      = image_tag current_shop.special_offer.product.featured_image_url, width: '70'
+      = current_shop.special_offer.product.title
+    %p
+      until
+      %strong #{current_shop.special_offer.ends_at.strftime('%d %B %Y %H:%M:%S %Z')}
+
+  = link_to 'Edit', edit_special_offer_path

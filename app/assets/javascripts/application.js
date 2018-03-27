@@ -10,5 +10,10 @@
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
 //
-//= require rails-ujs
-//= require_tree .
+//= require jquery
+//= require jquery_ujs
+//= require bootstrap
+//= require selectize/standalone/selectize
+//= require onmount
+//= require init
+//= require_tree ./components

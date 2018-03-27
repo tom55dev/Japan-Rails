@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180323014102) do
+ActiveRecord::Schema.define(version: 20180326051650) do
 
   create_table "customers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "shop_id"
@@ -70,6 +70,17 @@ ActiveRecord::Schema.define(version: 20180323014102) do
     t.index ["shopify_domain"], name: "index_shops_on_shopify_domain", unique: true
   end
 
+  create_table "special_offers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "shop_id"
+    t.bigint "product_id"
+    t.datetime "ends_at"
+    t.string "metafield_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_special_offers_on_product_id"
+    t.index ["shop_id"], name: "index_special_offers_on_shop_id"
+  end
+
   create_table "wishlist_items", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "wishlist_id"
     t.datetime "created_at", null: false
@@ -95,6 +106,8 @@ ActiveRecord::Schema.define(version: 20180323014102) do
   add_foreign_key "customers", "shops"
   add_foreign_key "product_variants", "products"
   add_foreign_key "products", "shops"
+  add_foreign_key "special_offers", "products"
+  add_foreign_key "special_offers", "shops"
   add_foreign_key "wishlist_items", "products"
   add_foreign_key "wishlist_items", "wishlists"
   add_foreign_key "wishlists", "customers"
