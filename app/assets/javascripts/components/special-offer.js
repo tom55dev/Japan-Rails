@@ -14,6 +14,13 @@ $.onmount('[data-toggle=special-offer]', function () {
     })
   }
 
+  var renderItem = function (item, escape) {
+    return '<div>' +
+      '<img src="' + item.featured_image_url + '" width="50px"/>&nbsp;&nbsp;&nbsp;' +
+      item.title +
+    '</div>'
+  }
+
   $el.selectize({
     load: onLoad,
     preload: 'focus',
@@ -21,7 +28,11 @@ $.onmount('[data-toggle=special-offer]', function () {
     labelField: 'title',
     options: [],
     placeholder: 'Search product here..',
-    searchField: ['id', 'title']
+    searchField: ['id', 'title'],
+    render: {
+      option: renderItem,
+      item: renderItem
+    }
   })
 
   var object = $el.data('product')

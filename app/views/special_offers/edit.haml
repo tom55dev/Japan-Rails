@@ -8,7 +8,7 @@
 
       .form-group
         = f.label :product_id
-        = f.select :product_id, [], {}, data: { toggle: 'special-offer', product: @special_offer.try(:product).try(:as_json, only: [:id, :title]) }
+        = f.select :product_id, [], {}, data: { toggle: 'special-offer', product: @special_offer.try(:product).try(:as_json, only: [:id, :title, :featured_image_url]) }
       .form-group
         = f.label :ends_at, 'Ends At *JST*'
         = f.datetime_field :ends_at, class: 'form-control'
