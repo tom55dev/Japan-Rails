@@ -15,5 +15,5 @@ Rails.application.config.middleware.use OmniAuth::Builder do
 
              strategy.options[:client_options][:site] = shop
            },
-           callback_path: Pathname.new(Rails.application.secrets.encrypted_path).join('auth/shopify/callback').to_s
+           callback_path: File.join(Rails.application.secrets.encrypted_path.to_s, 'auth/shopify/callback')
 end
