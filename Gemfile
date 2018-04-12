@@ -93,3 +93,6 @@ gem 'jsonapi-rails'
 
 # RACK CORS for HTTPS Allow-Access-Control-Origin
 gem 'rack-cors'
+
+# App tracker
+gem 'appsignal'
