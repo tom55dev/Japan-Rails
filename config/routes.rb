@@ -16,11 +16,14 @@ Rails.application.routes.draw do
     resources :products, only: [:index]
   end
 
-  resource :special_offer, only: [:edit, :update] do
-    get :search
+  scope Rails.application.secrets.encrypted_path do
+    resources :home, path: '/', only: [:index]
+    resource :special_offer, only: [:edit, :update] do
+      get :search
+    end
   end
 
-  root :to => 'home#index'
+  root to: redirect('http://japanhaul.com')
 
-  mount ShopifyApp::Engine, at: '/'
+  mount ShopifyApp::Engine, at: Rails.application.secrets.encrypted_path
 end

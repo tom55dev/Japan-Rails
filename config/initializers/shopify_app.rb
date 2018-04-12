@@ -1,5 +1,5 @@
 ShopifyApp.configure do |config|
-  website_url = Rails.application.secrets.website_url.to_s
+  website_url = File.join(Rails.application.secrets.website_url, Rails.application.secrets.encrypted_path)
 
   config.application_name = 'JapanHaul App'
   config.api_key = Rails.application.secrets.shopify_api_key
@@ -11,11 +11,13 @@ ShopifyApp.configure do |config|
 
   config.webhook_jobs_namespace = 'shopify'
 
+  config.root_url = Rails.application.secrets.encrypted_path
+
   # Webhooks
   config.webhooks = [
-    { topic: 'products/create', address: website_url + '/webhooks/products_create' },
-    { topic: 'products/update', address: website_url + '/webhooks/products_update' },
-    { topic: 'products/delete', address: website_url + '/webhooks/products_delete' },
+    { topic: 'products/create', address: File.join(website_url, '/webhooks/products_create') },
+    { topic: 'products/update', address: File.join(website_url, '/webhooks/products_update') },
+    { topic: 'products/delete', address: File.join(website_url, '/webhooks/products_delete') },
   ]
 
   config.after_authenticate_job = { job: Shopify::ShopSyncJob }
