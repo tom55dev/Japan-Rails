@@ -75,6 +75,8 @@ Rails.application.configure do
 
   # Use default logging formatter so that PID and timestamp are not suppressed.
   config.log_formatter = ::Logger::Formatter.new
+  config.force_ssl = true
+  config.ssl_options = { hsts: { subdomains: false } }
 
   # Use a different logger for distributed setups.
   # require 'syslog/logger'
