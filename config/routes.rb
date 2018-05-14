@@ -26,4 +26,6 @@ Rails.application.routes.draw do
   root to: redirect('http://japanhaul.com')
 
   mount ShopifyApp::Engine, at: Rails.application.secrets.encrypted_path.to_s
+
+  get '*path' => redirect('http://japanhaul.com')
 end
