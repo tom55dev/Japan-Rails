@@ -25,7 +25,7 @@ Rails.application.routes.draw do
 
   root to: redirect('http://japanhaul.com')
 
-  get '/api/webhooks/:type', to: 'api/webhooks#receive', as: :api_webhook
+  post '/api/webhooks/:type', to: 'api/webhooks#receive', as: :api_webhook
 
   mount ShopifyApp::Engine, at: Rails.application.secrets.encrypted_path.to_s
 
