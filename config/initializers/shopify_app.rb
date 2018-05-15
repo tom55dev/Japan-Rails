@@ -14,7 +14,7 @@ ShopifyApp.configure do |config|
   config.root_url = Rails.application.secrets.encrypted_path
 
   # Webhooks
-  webhook_url = File.join(Rails.application.secrets.website_url.to_s, 'api/webhooks')
+  webhook_url = File.join(Rails.application.secrets.website_url.to_s, 'webhooks')
   config.webhooks = [
     { topic: 'products/create', address: File.join(webhook_url, 'products_create') },
     { topic: 'products/update', address: File.join(webhook_url, 'products_update') },
