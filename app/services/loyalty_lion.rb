@@ -25,7 +25,7 @@ class LoyaltyLion
   private
 
   def post_to_loyalty_lion(type, points, product_name)
-    RestClient.post(api_url + '/' + type, { points: points, reason: product_name }.to_json, { accept: 'json', content_type: 'json' }) do |response|
+    RestClient.post(api_url + '/' + type, { points: points, reason: "Reward: #{product_name}" }.to_json, { accept: 'json', content_type: 'json' }) do |response|
       { success: response.code.between?(200, 209), error: error_msg(response) }
     end
   end
@@ -49,6 +49,7 @@ class LoyaltyLion
     else
       json[:error]
     end
+  rescue JSON::ParserError => e
   end
 
   def points_approved
