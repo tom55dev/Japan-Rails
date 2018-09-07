@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180326051650) do
+ActiveRecord::Schema.define(version: 20180907083523) do
 
   create_table "customers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "shop_id"
@@ -58,6 +58,7 @@ ActiveRecord::Schema.define(version: 20180326051650) do
     t.boolean "available"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "points_cost"
     t.index ["remote_id"], name: "index_products_on_remote_id"
     t.index ["shop_id"], name: "index_products_on_shop_id"
   end

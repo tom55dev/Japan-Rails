@@ -62,6 +62,7 @@ class RewardRedeemer
 
     if remote_product.save
       @created_variant = remote_product.variants.find { |v| v.option1 == reward_variant.option1 }
+
       { variant_id: created_variant.id, success: true, error: nil }
     else
       # Rarely happens, usually if there's a concurrency request it will make the variant negative in quantity
