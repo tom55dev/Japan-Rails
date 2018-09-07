@@ -15,7 +15,10 @@ Rails.application.routes.draw do
 
     resources :products, only: [:index]
 
-    resources :rewards
+    scope '/rewards', controller: :rewards do
+      post :redeem
+      post :remove
+    end
   end
 
   scope Rails.application.secrets.encrypted_path.to_s do

@@ -24,6 +24,14 @@ class RewardRedeemer
     @current_variant ||= product.variants.find { |v| v.id == variant_id }
   end
 
+  def customer
+    @customer ||= ShopifyAPI::Customer.find(customer_id)
+  end
+
+  def loyalty_lion
+    #@loyalty_lion ||= LoyaltyLion
+  end
+
   def redeem!
     if current_variant.inventory_quantity > 0
       create_variant!
@@ -66,7 +74,7 @@ class RewardRedeemer
       option1: variant_title,
       inventory_quantity: 1,
       metafields: [customer_metafield]
-    }.as_json
+    }
   end
 
   def variant_title
