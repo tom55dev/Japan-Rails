@@ -14,6 +14,8 @@ Rails.application.routes.draw do
     end
 
     resources :products, only: [:index]
+
+    resources :rewards
   end
 
   scope Rails.application.secrets.encrypted_path.to_s do
