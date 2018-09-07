@@ -96,3 +96,6 @@ gem 'rack-cors'
 
 # App tracker
 gem 'appsignal'
+
+# Rest client
+gem 'rest-client'

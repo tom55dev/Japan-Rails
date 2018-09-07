@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :shop do
-    sequence(:shopify_domain) { |n| "oms-tokyotreat-staging-#{n}.myshopify.com" }
+    sequence(:shopify_domain) { |n| "japan-gift-card-staging-#{n}.myshopify.com" }
     shopify_token 'test-token-here'
   end
 end
