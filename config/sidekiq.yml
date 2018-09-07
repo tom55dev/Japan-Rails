@@ -2,5 +2,6 @@
 :concurrency: 5
 :queues:
   - shopify_sync
+  - reward_sync
   - default
   - mailers
