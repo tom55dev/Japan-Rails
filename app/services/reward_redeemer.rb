@@ -40,7 +40,7 @@ class RewardRedeemer
       created_variant = product.variants.find { |v| v.option1 == reward_variant.option1 }
       { variant_id: created_variant.id, success: true, error: nil }
     else
-      { success: 'Sorry, a problem occured while claiming this product.' }
+      { success: false, error: 'Sorry, a problem occured while claiming this product.' }
     end
   end
 
