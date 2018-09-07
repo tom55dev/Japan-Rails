@@ -1,24 +1,28 @@
 class LoyaltyLion
-  attr_reader :shop, :customer
+  attr_reader :customer
 
-  def initialize(shop, customer)
-    @shop = shop
+  def initialize(customer)
     @customer = customer
   end
 
+  def points_approved
+    @points_approved ||= ShopifyAPI::Metafield.where(
+      resource: 'customers',
+      resource_id: customer.remote_id,
+      namespace: 'loyaltylion',
+      key: 'points_approved'
+    ).first&.value || 0
+  end
+
   def add(points:, product_name:)
-    shop.with_shopify_session do
-      post_to_loyalty_lion('points', points, "Reward redeemed: #{product_name}")
-    end
+    post_to_loyalty_lion('points', points, "Reward removed from cart: #{product_name}")
   end
 
   def deduct(points:, product_name:)
-    shop.with_shopify_session do
-      if points_approved >= points
-        post_to_loyalty_lion('remove_points', points, "Reward removed from cart: #{product_name}")
-      else
-        { success: false, error: cannot_claim_reward_message }
-      end
+    if points_approved >= points
+      post_to_loyalty_lion('remove_points', points, "Reward redeemed: #{product_name}")
+    else
+      { success: false, error: cannot_claim_reward_message }
     end
   end
 
@@ -50,13 +54,6 @@ class LoyaltyLion
       json[:error]
     end
   rescue JSON::ParserError => e
-  end
-
-  def points_approved
-    remote_customer = ShopifyAPI::Customer.find(customer.remote_id)
-    metafield = remote_customer.metafields.find { |m| m.namespace == 'loyaltylion' && m.key == 'points_approved' }
-
-    metafield&.value || 0
   end
 
   def cannot_claim_reward_message

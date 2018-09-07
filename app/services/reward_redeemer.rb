@@ -1,5 +1,5 @@
 class RewardRedeemer
-  attr_reader :shop, :product_id, :variant_id, :customer_id
+  attr_reader :shop, :product_id, :variant_id, :customer_id, :created_variant
 
   def initialize(shop:, product_id:, variant_id:, customer_id:)
     @shop = shop
@@ -10,44 +10,62 @@ class RewardRedeemer
 
   def call
     shop.with_shopify_session do
-      redeem!
+      if variant_points_cost <= 0 || remote_variant.inventory_quantity <= 0
+        { success: false, error: 'Oops, sorry you cannot redeem this product anymore.' }
+      elsif loyalty_lion.points_approved < variant_points_cost
+        { success: false, error: 'Sorry, you don\'t have enough points to redeem this product.' }
+      else
+        redeem!
+      end
     end
   end
 
   private
 
-  def product
-    @product ||= ShopifyAPI::Product.find(product_id)
+  def remote_product
+    @remote_product ||= ShopifyAPI::Product.find(product_id)
   end
 
-  def current_variant
-    @current_variant ||= product.variants.find { |v| v.id == variant_id }
+  def remote_variant
+    @remote_variant ||= remote_product.variants.find { |v| v.id == variant_id }
   end
 
   def customer
-    @customer ||= ShopifyAPI::Customer.find(customer_id)
+    @customer ||= Customer.find_by(remote_id: customer_id)
   end
 
   def loyalty_lion
-    #@loyalty_lion ||= LoyaltyLion
+    @loyalty_lion ||= LoyaltyLion.new(customer)
+  end
+
+  def variant_points_cost
+    # Points are in the product metafield
+    @variant_points ||= remote_product.metafields.find do |m|
+      m.namespace == 'points_market' &&  m.key == 'points_cost'
+    end&.value || 0
   end
 
   def redeem!
-    if current_variant.inventory_quantity > 0
-      create_variant!
+    result = create_variant!
+
+    if result[:success]
+      lion = loyalty_lion.deduct(points: variant_points_cost, product_name: remote_product.title)
+      lion[:success] ? result : (created_variant.destroy and lion) # Might need to push on worker to ensure variant destroys
     else
-      { success: false, error: 'Sorry, you cannot redeem this product anymore.' }
+      result
     end
   end
 
   def create_variant!
-    current_variant.inventory_quantity -= 1
-    product.variants << reward_variant
+    remote_variant.inventory_quantity -= 1
+    remote_product.variants << reward_variant
 
-    if product.save
-      created_variant = product.variants.find { |v| v.option1 == reward_variant.option1 }
+    if remote_product.save
+      @created_variant = remote_product.variants.find { |v| v.option1 == reward_variant.option1 }
       { variant_id: created_variant.id, success: true, error: nil }
     else
+      # Rarely happens, usually if there's a concurrency request it will make the variant negative in quantity
+      # There's also a possiblity this will happen if shopify receives too many request on the API
       { success: false, error: 'Sorry, a problem occured while claiming this product.' }
     end
   end
@@ -61,7 +79,7 @@ class RewardRedeemer
   end
 
   def variant_attrs
-    current_variant.attributes.slice(
+    remote_variant.attributes.slice(
       'sku', 'position', 'inventory_policy', 'fulfillment_service',
       'inventory_management', 'weight', 'weight_unit', 'image_id'
     ).symbolize_keys
@@ -78,10 +96,10 @@ class RewardRedeemer
   end
 
   def variant_title
-    if current_variant.title == 'Default Title'
+    if remote_variant.title == 'Default Title'
       "Reward ##{Time.zone.now.to_i}"
     else
-      "#{current_variant.title} (Reward ##{Time.zone.now.to_i})"
+      "#{remote_variant.title} (Reward ##{Time.zone.now.to_i})"
     end
   end
 
