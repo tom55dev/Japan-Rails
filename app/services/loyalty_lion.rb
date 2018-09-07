@@ -8,14 +8,14 @@ class LoyaltyLion
 
   def add(points:, product_name:)
     shop.with_shopify_session do
-      post_to_loyalty_lion('points', points, product_name)
+      post_to_loyalty_lion('points', points, "Reward redeemed: #{product_name}")
     end
   end
 
   def deduct(points:, product_name:)
     shop.with_shopify_session do
       if points_approved >= points
-        post_to_loyalty_lion('remove_points', points, product_name)
+        post_to_loyalty_lion('remove_points', points, "Reward removed from cart: #{product_name}")
       else
         { success: false, error: cannot_claim_reward_message }
       end
@@ -24,8 +24,8 @@ class LoyaltyLion
 
   private
 
-  def post_to_loyalty_lion(type, points, product_name)
-    RestClient.post(api_url + '/' + type, { points: points, reason: "Reward: #{product_name}" }.to_json, { accept: 'json', content_type: 'json' }) do |response|
+  def post_to_loyalty_lion(type, points, reason)
+    RestClient.post(api_url + '/' + type, { points: points, reason: reason }.to_json, { accept: 'json', content_type: 'json' }) do |response|
       { success: response.code.between?(200, 209), error: error_msg(response) }
     end
   end
