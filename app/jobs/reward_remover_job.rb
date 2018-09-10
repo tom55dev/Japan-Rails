@@ -4,12 +4,15 @@ class RewardRemoverJob < ApplicationJob
   queue_as :reward_sync
 
   def perform(customer_id, product_id, variant_id)
-    @remote_product = ShopifyAPI::Product.find(product_id)
-    @customer       = Customer.find_by(remote_id: customer_id)
-    @reward         = customer.rewards.find_by(redeemed_remote_variant_id: variant_id)
+    @customer = Customer.find_by(remote_id: customer_id)
+    @reward   = customer.rewards.find_by(redeemed_remote_variant_id: variant_id)
 
-    remove!
-  rescue ActiveResource::ResourceNotFound => e
+    return if reward.blank?
+
+    customer.shop.with_shopify_session do
+      @remote_product = ShopifyAPI::Product.find(product_id)
+      remove!
+    end
   end
 
   private

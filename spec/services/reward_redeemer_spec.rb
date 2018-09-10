@@ -11,7 +11,6 @@ describe RewardRedeemer do
   let!(:product_json) { JSON.parse(File.read('spec/fixtures/shopify_product.json')) }
   let!(:shopify_product) { ShopifyAPI::Product.new(product: product_json) }
   let!(:current_variant) { shopify_product.variants.first }
-  let!(:market_metafield) { ShopifyAPI::Metafield.new(namespace: 'points_market', key: 'points_cost', value: 500, value_type: 'integer') }
   let!(:redeem_params) do
     { shop: shop, customer_id: customer.remote_id, product_id: shopify_product.id, variant_id: current_variant.id }
   end
@@ -20,9 +19,9 @@ describe RewardRedeemer do
   let!(:redeemer) { RewardRedeemer.new(redeem_params) }
 
   before do
+    create :product, remote_id: shopify_product.id, points_cost: 500
     current_variant.inventory_quantity = 10
     allow(ShopifyAPI::Product).to receive(:find).and_return(shopify_product)
-    allow(shopify_product).to receive(:metafields).and_return([market_metafield])
     allow(shopify_product).to receive(:save).and_return(true)
     allow(redeemer).to receive(:loyalty_lion).and_return(loyalty_lion)
     allow(redeemer).to receive(:created_variant).and_return(ShopifyAPI::Variant.new(id: 'created_variant_id'))
