@@ -1,12 +1,12 @@
 class RewardRemoverJob < ApplicationJob
-  attr_reader :remote_variant, :variant, :customer
+  attr_reader :reward, :remote_product, :customer
 
   queue_as :reward_sync
 
-  def perform(variant_id, customer_id)
-    @variant        = ProductVariant.find_by(remote_id: variant_id)
-    @remote_product = ShopifyAPI::Product.find(variant.product.remote_id)
+  def perform(customer_id, product_id, variant_id)
+    @remote_product = ShopifyAPI::Product.find(product_id)
     @customer       = Customer.find_by(remote_id: customer_id)
+    @reward         = customer.rewards.find_by(redeemed_remote_variant_id: variant_id)
 
     remove!
   rescue ActiveResource::ResourceNotFound => e
@@ -14,12 +14,25 @@ class RewardRemoverJob < ApplicationJob
 
   private
 
+  def redeemed_variant
+    remote_product.variants.find { |v| v.id.to_s == reward.redeemed_remote_variant_id }
+  end
+
+  def referenced_variant
+    remote_product.variants.find { |v| v.id.to_s == reward.referenced_remote_variant_id }
+  end
+
+  def variant
+    @variant ||= ProductVariant.find_by(remote_id: referenced_variant.id)
+  end
+
   def remove!
-    # referenced variant_id?
-    # increase the quantity of referenced variant
-    remote_variant.destroy!
+    referenced_variant.inventory_quantity += 1 if redeemed_variant.present?
+    remote_product.variants.reject! { |v| v == redeemed_variant }
+    remote_product.save!
 
     loyalty_lion.add(points: variant.product.points_cost, product_name: variant.product.title)
+    reward.destroy!
   end
 
   def loyalty_lion

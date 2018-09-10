@@ -50,7 +50,7 @@ class RewardRedeemer
 
     if result[:success]
       lion = loyalty_lion.deduct(points: variant_points_cost, product_name: remote_product.title)
-      lion[:success] ? result : (created_variant.destroy and lion) # Might need to push on worker to ensure variant destroys
+      lion[:success] ? result : (remove_created_variant! and lion) # Might need to push on worker to ensure variant destroys
     else
       result
     end
@@ -77,6 +77,10 @@ class RewardRedeemer
       redeemed_remote_variant_id: created_variant.id,
       referenced_remote_variant_id: remote_variant.id
     )
+  end
+
+  def remove_created_variant!
+    RewardRemoverJob.new(customer.remote_id, remote_product.id, created_variant.id)
   end
 
   def reward_variant

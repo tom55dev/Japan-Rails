@@ -1,4 +1,5 @@
 class Reward < ApplicationRecord
   belongs_to :customer
-  belongs_to :product_variant
+
+  validates :redeemed_remote_variant_id, :referenced_remote_variant_id, presence: true
 end
