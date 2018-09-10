@@ -5,6 +5,10 @@ class Api::RewardsController < ApiController
     render json: redeemer.call
   end
 
+  def remove
+
+  end
+
   private
 
   def redeem_params

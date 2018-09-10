@@ -62,6 +62,7 @@ class RewardRedeemer
 
     if remote_product.save
       @created_variant = remote_product.variants.find { |v| v.option1 == reward_variant.option1 }
+      create_reward!
 
       { variant_id: created_variant.id, success: true, error: nil }
     else
@@ -69,6 +70,13 @@ class RewardRedeemer
       # There's also a possiblity this will happen if shopify receives too many request on the API
       { success: false, error: 'Sorry, a problem occured while claiming this product.' }
     end
+  end
+
+  def create_reward!
+    customer.rewards.create!(
+      redeemed_remote_variant_id: created_variant.id,
+      referenced_remote_variant_id: remote_variant.id
+    )
   end
 
   def reward_variant

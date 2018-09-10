@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180907083523) do
+ActiveRecord::Schema.define(version: 20180910025834) do
 
   create_table "customers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "shop_id"
@@ -63,6 +63,17 @@ ActiveRecord::Schema.define(version: 20180907083523) do
     t.index ["shop_id"], name: "index_products_on_shop_id"
   end
 
+  create_table "rewards", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "customer_id"
+    t.string "redeemed_remote_variant_id"
+    t.string "referenced_remote_variant_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["customer_id"], name: "index_rewards_on_customer_id"
+    t.index ["redeemed_remote_variant_id"], name: "index_rewards_on_redeemed_remote_variant_id"
+    t.index ["referenced_remote_variant_id"], name: "index_rewards_on_referenced_remote_variant_id"
+  end
+
   create_table "shops", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "shopify_domain", null: false
     t.string "shopify_token", null: false
@@ -107,6 +118,7 @@ ActiveRecord::Schema.define(version: 20180907083523) do
   add_foreign_key "customers", "shops"
   add_foreign_key "product_variants", "products"
   add_foreign_key "products", "shops"
+  add_foreign_key "rewards", "customers"
   add_foreign_key "special_offers", "products"
   add_foreign_key "special_offers", "shops"
   add_foreign_key "wishlist_items", "products"
