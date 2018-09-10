@@ -25,6 +25,8 @@ describe RewardRedeemer do
     allow(shopify_product).to receive(:metafields).and_return([market_metafield])
     allow(shopify_product).to receive(:save).and_return(true)
     allow(redeemer).to receive(:loyalty_lion).and_return(loyalty_lion)
+    allow(redeemer).to receive(:created_variant).and_return(ShopifyAPI::Variant.new(id: 'created_variant_id'))
+    allow(RewardRemoverJob).to receive(:perform_later).and_return(true)
   end
 
   describe '#call' do
@@ -32,6 +34,12 @@ describe RewardRedeemer do
       expect {
         redeemer.call
       }.to change(shopify_product.variants, :count).by(1)
+    end
+
+    it 'creates a reward model' do
+      expect {
+        redeemer.call
+      }.to change(Reward, :count).by(1)
     end
 
     it 'builds the correct variant' do
@@ -63,7 +71,7 @@ describe RewardRedeemer do
     end
 
     it 'returns a success=true and variant_id key' do
-      expect(redeemer.call).to eq({ variant_id: nil, success: true, error: nil })
+      expect(redeemer.call).to eq({ variant_id: 'created_variant_id', success: true, error: nil })
     end
 
     context 'when variant save fails' do
@@ -105,14 +113,14 @@ describe RewardRedeemer do
         allow_any_instance_of(ShopifyAPI::Variant).to receive(:destroy).and_return(true)
       end
 
-      it 'destroys the created variant' do
-        expect_any_instance_of(ShopifyAPI::Variant).to receive(:destroy)
-
-        redeemer.call
-      end
-
       it 'returns the response from loyalty lion class' do
         expect(redeemer.call).to eq(lion_result)
+      end
+
+      it 'calls the reward remover job' do
+        expect(RewardRemoverJob).to receive(:perform_later).with(customer.remote_id, shopify_product.id, 'created_variant_id')
+
+        redeemer.call
       end
     end
   end
