@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe RewardRedeemer do
   let!(:shop) { create :shop }
-  let!(:customer) { create :customer }
+  let!(:customer) { create :customer, shop: shop }
 
   before do
     ShopifyAPI::Base.activate_session(ShopifyAPI::Session.new(shop.shopify_domain, shop.shopify_token))
@@ -19,7 +19,7 @@ describe RewardRedeemer do
   let!(:redeemer) { RewardRedeemer.new(redeem_params) }
 
   before do
-    create :product, remote_id: shopify_product.id, points_cost: 500
+    create :product, shop: shop, remote_id: shopify_product.id, points_cost: 500
     current_variant.inventory_quantity = 10
     allow(ShopifyAPI::Product).to receive(:find).and_return(shopify_product)
     allow(shopify_product).to receive(:save).and_return(true)
@@ -125,7 +125,7 @@ describe RewardRedeemer do
       end
 
       it 'calls the reward remover job' do
-        expect(RewardRemoverJob).to receive(:perform_later).with(customer.remote_id, shopify_product.id, 'created_variant_id', false)
+        expect(RewardRemoverJob).to receive(:perform_later).with(shop.id, customer.remote_id, shopify_product.id, 'created_variant_id', false)
 
         redeemer.call
       end

@@ -33,7 +33,7 @@ class RewardRedeemer
   end
 
   def customer
-    @customer ||= Customer.find_by(remote_id: customer_id)
+    @customer ||= shop.customers.find_by(remote_id: customer_id)
   end
 
   def reward
@@ -48,7 +48,7 @@ class RewardRedeemer
   end
 
   def product_points_cost
-    @product_points_cost ||= Product.find_by(remote_id: remote_product.id).points_cost
+    @product_points_cost ||= shop.products.find_by(remote_id: remote_product.id).points_cost
   end
 
   def redeem!
@@ -84,7 +84,7 @@ class RewardRedeemer
   end
 
   def remove_created_variant!
-    RewardRemoverJob.perform_later(customer.remote_id, remote_product.id, created_variant.id, false)
+    RewardRemoverJob.perform_later(shop.id, customer.remote_id, remote_product.id, created_variant.id, false)
   end
 
   def reward_variant
