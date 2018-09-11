@@ -10,9 +10,9 @@ class RewardRedeemer
 
   def call
     shop.with_shopify_session do
-      if variant_points_cost <= 0 || remote_variant.inventory_quantity <= 0
+      if product_points_cost <= 0 || remote_variant.inventory_quantity <= 0
         { success: false, error: 'Oops, sorry you cannot redeem this product anymore.' }
-      elsif loyalty_lion.points_approved < variant_points_cost
+      elsif loyalty_lion.points_approved < product_points_cost
         { success: false, error: 'Sorry, you don\'t have enough points to redeem this product.' }
       else
         redeem!
@@ -38,19 +38,16 @@ class RewardRedeemer
     @loyalty_lion ||= LoyaltyLion.new(customer)
   end
 
-  def variant_points_cost
-    # Points are in the product metafield
-    @variant_points ||= remote_product.metafields.find do |m|
-      m.namespace == 'points_market' &&  m.key == 'points_cost'
-    end&.value || 0
+  def product_points_cost
+    @product_points_cost ||= Product.find_by(remote_id: remote_product.id).points_cost
   end
 
   def redeem!
     result = create_variant!
 
     if result[:success]
-      lion = loyalty_lion.deduct(points: variant_points_cost, product_name: remote_product.title)
-      lion[:success] ? result : (created_variant.destroy and lion) # Might need to push on worker to ensure variant destroys
+      lion = loyalty_lion.deduct(points: product_points_cost, product_name: remote_product.title)
+      lion[:success] ? result : (remove_created_variant! and lion)
     else
       result
     end
@@ -62,12 +59,25 @@ class RewardRedeemer
 
     if remote_product.save
       @created_variant = remote_product.variants.find { |v| v.option1 == reward_variant.option1 }
+      create_reward!
+
       { variant_id: created_variant.id, success: true, error: nil }
     else
       # Rarely happens, usually if there's a concurrency request it will make the variant negative in quantity
       # There's also a possiblity this will happen if shopify receives too many request on the API
       { success: false, error: 'Sorry, a problem occured while claiming this product.' }
     end
+  end
+
+  def create_reward!
+    customer.rewards.create!(
+      redeemed_remote_variant_id: created_variant.id,
+      referenced_remote_variant_id: remote_variant.id
+    )
+  end
+
+  def remove_created_variant!
+    RewardRemoverJob.perform_later(customer.remote_id, remote_product.id, created_variant.id)
   end
 
   def reward_variant

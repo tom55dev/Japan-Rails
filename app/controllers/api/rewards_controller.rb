@@ -5,6 +5,12 @@ class Api::RewardsController < ApiController
     render json: redeemer.call
   end
 
+  def remove
+    RewardRemoverJob.perform_later(params[:customer_id], params[:product_id], params[:variant_id])
+
+    render json: { success: true }
+  end
+
   private
 
   def redeem_params

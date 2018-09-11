@@ -35,7 +35,8 @@ class ProductSync
       tags:               product.tags,
       price_min:          price_min,
       compare_price_min:  compare_price_min,
-      available:          available?
+      available:          available?,
+      points_cost:        points_cost
     }
   end
 
@@ -53,5 +54,11 @@ class ProductSync
 
   def available?
     variants.any? { |v| v.inventory_policy == 'deny' && v.inventory_quantity > 0 }
+  end
+
+  def points_cost
+    (product.metafields || []).find do |metafield|
+      metafield.namespace == 'points_market' && metafield.key == 'points_cost'
+    end&.value
   end
 end
