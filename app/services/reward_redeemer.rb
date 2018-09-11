@@ -1,4 +1,6 @@
 class RewardRedeemer
+  EXPIRATION_TIME = 2.hours
+
   attr_reader :shop, :product_id, :variant_id, :customer_id, :created_variant
 
   def initialize(shop:, product_id:, variant_id:, customer_id:)
@@ -34,6 +36,13 @@ class RewardRedeemer
     @customer ||= Customer.find_by(remote_id: customer_id)
   end
 
+  def reward
+    @reward ||= customer.rewards.create!(
+      redeemed_remote_variant_id: created_variant.id,
+      referenced_remote_variant_id: remote_variant.id
+    )
+  end
+
   def loyalty_lion
     @loyalty_lion ||= LoyaltyLion.new(customer)
   end
@@ -45,12 +54,7 @@ class RewardRedeemer
   def redeem!
     result = create_variant!
 
-    if result[:success]
-      lion = loyalty_lion.deduct(points: product_points_cost, product_name: remote_product.title)
-      lion[:success] ? result : (remove_created_variant! and lion)
-    else
-      result
-    end
+    result[:success] ? record_on_loyalty_lion!(result) : result
   end
 
   def create_variant!
@@ -59,7 +63,7 @@ class RewardRedeemer
 
     if remote_product.save
       @created_variant = remote_product.variants.find { |v| v.option1 == reward_variant.option1 }
-      create_reward!
+      reward # creates a reward
 
       { variant_id: created_variant.id, success: true, error: nil }
     else
@@ -69,11 +73,14 @@ class RewardRedeemer
     end
   end
 
-  def create_reward!
-    customer.rewards.create!(
-      redeemed_remote_variant_id: created_variant.id,
-      referenced_remote_variant_id: remote_variant.id
-    )
+  def record_on_loyalty_lion!(result)
+    lion = loyalty_lion.deduct(points: product_points_cost, product_name: remote_product.title)
+    if lion[:success]
+      RewardExpiryJob.set(wait: EXPIRATION_TIME).perform_later(reward.id)
+      result
+    else
+      remove_created_variant! and lion
+    end
   end
 
   def remove_created_variant!

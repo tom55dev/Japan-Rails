@@ -26,6 +26,7 @@ describe RewardRedeemer do
     allow(redeemer).to receive(:loyalty_lion).and_return(loyalty_lion)
     allow(redeemer).to receive(:created_variant).and_return(ShopifyAPI::Variant.new(id: 'created_variant_id'))
     allow(RewardRemoverJob).to receive(:perform_later).and_return(true)
+    allow_any_instance_of(RewardExpiryJob).to receive(:perform).and_return(true)
   end
 
   describe '#call' do
@@ -71,6 +72,13 @@ describe RewardRedeemer do
 
     it 'returns a success=true and variant_id key' do
       expect(redeemer.call).to eq({ variant_id: 'created_variant_id', success: true, error: nil })
+    end
+
+    it 'sets an expiration time for the reward' do
+      expiry = class_double(RewardExpiryJob, perform_later: nil)
+      expect(RewardExpiryJob).to receive(:set).with(wait: 2.hours).and_return(expiry)
+
+      redeemer.call
     end
 
     context 'when variant save fails' do
