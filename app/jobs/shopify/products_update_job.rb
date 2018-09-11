@@ -8,11 +8,12 @@ class Shopify::ProductsUpdateJob < ApplicationJob
 
     ShopifyAPI::Base.activate_session(access)
 
-    shopify_product = ShopifyAPI::Product.new(args[:webhook])
-    model = ProductSync.new(shop, shopify_product).call
+    remote_product = ShopifyAPI::Product.new(args[:webhook])
+    product = ProductSync.new(shop, remote_product).call
 
-    shopify_product.variants.each do |variant|
-      ProductVariantSync.new(model, variant).call
+    product.product_variants.where.not(remote_id: remote_product.variants.map(&:id)).destroy_all
+    remote_product.variants.each do |remote_variant|
+      ProductVariantSync.new(product, remote_variant).call
     end
   end
 end
