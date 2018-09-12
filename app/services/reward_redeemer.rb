@@ -29,7 +29,7 @@ class RewardRedeemer
   end
 
   def remote_variant
-    @remote_variant ||= remote_product.variants.find { |v| v.id == variant_id }
+    @remote_variant ||= remote_product.variants.find { |v| v.id == variant_id.to_i }
   end
 
   def customer
