@@ -241,6 +241,8 @@ GEM
     rb-inotify (0.9.10)
       ffi (>= 0.5.0, < 2)
     redis (4.0.1)
+    redis-namespace (1.6.0)
+      redis (>= 3.0.4)
     rest-client (2.0.2)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
@@ -360,6 +362,7 @@ DEPENDENCIES
   rails-assets-bootstrap!
   rails-assets-onmount!
   rails-assets-selectize!
+  redis-namespace
   rest-client
   rspec-rails (~> 3.5.0)
   sass-rails (~> 5.0)
