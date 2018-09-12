@@ -107,7 +107,7 @@ describe RewardRedeemer do
       end
 
       it 'returns a success=false with error message' do
-        expect(redeemer.call).to eq ({ success: false, error: 'Oops, sorry you cannot redeem this product anymore.' })
+        expect(redeemer.call).to eq ({ success: false, error: 'Oops, sorry this product is out of stock.' })
       end
     end
 

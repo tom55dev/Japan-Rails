@@ -12,8 +12,10 @@ class RewardRedeemer
 
   def call
     shop.with_shopify_session do
-      if product_points_cost <= 0 || remote_variant.inventory_quantity <= 0
+      if product_points_cost <= 0
         { success: false, error: 'Oops, sorry you cannot redeem this product anymore.' }
+      elsif remote_variant.inventory_quantity <= 0
+        { success: false, error: 'Oops, sorry this product is out of stock.' }
       elsif loyalty_lion.points_approved < product_points_cost
         { success: false, error: 'Sorry, you don\'t have enough points to redeem this product.' }
       else
