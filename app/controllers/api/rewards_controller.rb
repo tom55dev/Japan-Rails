@@ -8,7 +8,9 @@ class Api::RewardsController < ApiController
   def remove
     RewardRemoverJob.perform_later(current_shop.id, params[:customer_id], params[:product_id], params[:variant_id])
 
-    render json: { success: true }
+    product = Product.find_by(remote_id: params[:product_id])
+
+    render json: { success: true, points: product&.points_cost || 0 }
   end
 
   private
