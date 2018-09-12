@@ -1,6 +1,6 @@
 class Api::RewardsController < ApiController
   def redeem
-    redeemer = RewardRedeemer.new redeem_params.merge(shop: current_shop)
+    redeemer = RewardRedeemer.new(redeem_params.merge(shop: current_shop))
 
     render json: redeemer.call
   end
@@ -14,6 +14,6 @@ class Api::RewardsController < ApiController
   private
 
   def redeem_params
-    params.permit(:product_id, :variant_id, :customer_id)
+    params.permit(:product_id, :variant_id, :customer_id).as_json.symbolize_keys
   end
 end
