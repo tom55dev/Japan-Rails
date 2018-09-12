@@ -5,16 +5,18 @@ class RewardExpiryJob < ApplicationJob
     reward = Reward.find(reward_id)
     return if reward.purchased_at.present? # Don't expire if customer has successfully checkout
 
-    variant = ShopifyAPI::Variant.find(reward.redeemed_remote_variant_id)
+    reward.customer.shop.with_shopify_session do
+      variant = ShopifyAPI::Variant.find(reward.redeemed_remote_variant_id)
 
-    return if variant.inventory_quantity.zero? # Double check if variant was actually used in an order and skip this job
+      return if variant.inventory_quantity.zero? # Double check if variant was actually used in an order and skip this job
 
-    RewardRemoverJob.new.perform(
-      reward.customer.shop_id,
-      reward.customer.remote_id,
-      variant.product_id,
-      variant.id
-    )
+      RewardRemoverJob.new.perform(
+        reward.customer.shop_id,
+        reward.customer.remote_id,
+        variant.product_id,
+        variant.id
+      )
+    end
   rescue ActiveRecord::RecordNotFound, ActiveResource::ResourceNotFound => e
   end
 end
