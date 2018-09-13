@@ -5,7 +5,7 @@ class RewardRemoverJob < ApplicationJob
 
   def perform(shop_id:, customer_id:, product_id:, variant_id:, add_points: true)
     @shop = Shop.find(shop_id)
-    @customer = shop.customers.find_by(remote_id: customer_id)
+    @customer = CustomerFinder.new(shop, customer_id).call
     @reward   = customer.rewards.find_by(redeemed_remote_variant_id: variant_id)
     @add_points = add_points
 

@@ -53,6 +53,6 @@ class WishlistCreator
   end
 
   def customer
-    CustomerSync.new(shop, customer_id).call
+    CustomerSync.new(shop, customer_id: customer_id).call
   end
 end
