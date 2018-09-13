@@ -86,7 +86,13 @@ class RewardRedeemer
   end
 
   def remove_created_variant!
-    RewardRemoverJob.perform_later(shop.id, customer.remote_id, remote_product.id, created_variant.id, false)
+    RewardRemoverJob.perform_later(
+      shop_id: shop.id,
+      customer_id: customer.remote_id,
+      product_id: remote_product.id,
+      variant_id: created_variant.id,
+      add_points: false
+    )
   end
 
   def reward_variant

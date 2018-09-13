@@ -11,7 +11,7 @@ describe RewardExpiryJob do
 
   describe '#perform' do
     it 'calls the RewardRemoverJob' do
-      expect_any_instance_of(RewardRemoverJob).to receive(:perform).with(reward.customer.shop_id, reward.customer.remote_id, '0', '0')
+      expect_any_instance_of(RewardRemoverJob).to receive(:perform).with(shop_id: reward.customer.shop_id, customer_id: reward.customer.remote_id, variant_id: '0', product_id: '0')
 
       RewardExpiryJob.perform_later(reward.id)
     end

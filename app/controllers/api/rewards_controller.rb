@@ -6,7 +6,12 @@ class Api::RewardsController < ApiController
   end
 
   def remove
-    RewardRemoverJob.perform_later(current_shop.id, params[:customer_id], params[:product_id], params[:variant_id])
+    RewardRemoverJob.perform_later({
+      shop_id: current_shop.id,
+      customer_id: params[:customer_id],
+      product_id: params[:product_id],
+      variant_id: params[:variant_id]
+    })
 
     product = Product.find_by(remote_id: params[:product_id])
 

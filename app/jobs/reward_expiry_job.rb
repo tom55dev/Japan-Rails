@@ -11,10 +11,10 @@ class RewardExpiryJob < ApplicationJob
       return if variant.inventory_quantity.zero? # Double check if variant was actually used in an order and skip this job
 
       RewardRemoverJob.new.perform(
-        reward.customer.shop_id,
-        reward.customer.remote_id,
-        variant.product_id,
-        variant.id
+        shop_id: reward.customer.shop_id,
+        customer_id: reward.customer.remote_id,
+        product_id: variant.product_id,
+        variant_id: variant.id
       )
     end
   rescue ActiveRecord::RecordNotFound, ActiveResource::ResourceNotFound => e

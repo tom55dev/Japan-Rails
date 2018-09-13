@@ -125,7 +125,7 @@ describe RewardRedeemer do
       end
 
       it 'calls the reward remover job' do
-        expect(RewardRemoverJob).to receive(:perform_later).with(shop.id, customer.remote_id, shopify_product.id, 'created_variant_id', false)
+        expect(RewardRemoverJob).to receive(:perform_later).with(shop_id: shop.id, customer_id: customer.remote_id, product_id: shopify_product.id, variant_id: 'created_variant_id', add_points: false)
 
         redeemer.call
       end

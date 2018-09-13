@@ -14,7 +14,7 @@ describe Api::RewardsController do
 
   describe 'POST remove' do
     it 'calls the RewardRemoverJob' do
-      expect(RewardRemoverJob).to receive(:perform_later).with(shop.id, customer.remote_id, '0', '0')
+      expect(RewardRemoverJob).to receive(:perform_later).with(shop_id: shop.id, customer_id: customer.remote_id, product_id: '0', variant_id: '0')
 
       post :remove, params: { shop: shop.shopify_domain, customer_id: customer.remote_id, product_id: '0', variant_id: '0' }
     end

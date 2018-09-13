@@ -29,13 +29,13 @@ describe RewardRemoverJob do
   describe '#perform' do
     it 'increases the referenced variant quantity by 1' do
       expect(referenced_variant.inventory_quantity).to eq 0
-      remover.perform(shop.id, customer.remote_id, shopify_product.id, reward_variant.id)
+      remover.perform(shop_id: shop.id, customer_id: customer.remote_id, product_id: shopify_product.id, variant_id: reward_variant.id)
       expect(referenced_variant.inventory_quantity).to eq 1
     end
 
     it 'rejects the redeemed variant on the product' do
       expect(shopify_product.variants).to include(reward_variant)
-      remover.perform(shop.id, customer.remote_id, shopify_product.id, reward_variant.id)
+      remover.perform(shop_id: shop.id, customer_id: customer.remote_id, product_id: shopify_product.id, variant_id: reward_variant.id)
 
       expect(shopify_product.variants).not_to include(reward_variant)
     end
@@ -43,12 +43,12 @@ describe RewardRemoverJob do
     it 'adds the loyalty lion points back to the customer' do
       expect(loyalty_lion).to receive(:add).with(points: 500, product_name: shopify_product.title)
 
-      remover.perform(shop.id, customer.remote_id, shopify_product.id, reward_variant.id)
+      remover.perform(shop_id: shop.id, customer_id: customer.remote_id, product_id: shopify_product.id, variant_id: reward_variant.id)
     end
 
     it 'deletes the reward' do
       expect {
-        remover.perform(shop.id, customer.remote_id, shopify_product.id, reward_variant.id)
+        remover.perform(shop_id: shop.id, customer_id: customer.remote_id, product_id: shopify_product.id, variant_id: reward_variant.id)
       }.to change(Reward, :count).by(-1)
     end
   end
