@@ -19,7 +19,8 @@ class RewardRedeemer
       elsif loyalty_lion.points_approved < product_points_cost
         { success: false, error: 'Sorry, you don\'t have enough points to redeem this product.' }
       else
-        redeem!
+        ActiveRecord::Base.transaction { redeem! }
+        # better not use transaction? and check in rescue if reward exist
       end
     end
   rescue LoyaltyLion::CannotFetchPointsError => e
@@ -69,10 +70,10 @@ class RewardRedeemer
 
     if remote_product.save
       @created_variant = remote_product.variants.find { |v| v.option1 == reward_variant.option1 }
-      reward # creates a reward
 
       { variant_id: created_variant.id, remaining_quantity: remote_variant.inventory_quantity, success: true, error: nil }
     else
+      reward.destroy!
       # Rarely happens, usually if there's a concurrency request it will make the variant negative in quantity
       # There's also a possiblity this will happen if shopify receives too many request on the API
       { success: false, error: 'Sorry, a problem occured while claiming this product.' }
@@ -125,10 +126,11 @@ class RewardRedeemer
   end
 
   def variant_title
+    id = Time.zone.now.to_i + reward.id
     if remote_variant.title == 'Default Title'
-      "Reward ##{Time.zone.now.to_i}"
+      "Reward ##{id}"
     else
-      "#{remote_variant.title} (Reward ##{Time.zone.now.to_i})"
+      "#{remote_variant.title} (Reward ##{id})"
     end
   end
 
