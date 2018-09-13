@@ -70,10 +70,11 @@ class RewardRedeemer
 
     if remote_product.save
       @created_variant = remote_product.variants.find { |v| v.option1 == reward_variant.option1 }
+      reward
+      # check if quantity is negative?
 
       { variant_id: created_variant.id, remaining_quantity: remote_variant.inventory_quantity, success: true, error: nil }
     else
-      reward.destroy!
       # Rarely happens, usually if there's a concurrency request it will make the variant negative in quantity
       # There's also a possiblity this will happen if shopify receives too many request on the API
       { success: false, error: 'Sorry, a problem occured while claiming this product.' }
@@ -126,7 +127,7 @@ class RewardRedeemer
   end
 
   def variant_title
-    id = Time.zone.now.to_i + reward.id
+    id = Time.zone.now.to_i + customer.id
     if remote_variant.title == 'Default Title'
       "Reward ##{id}"
     else
