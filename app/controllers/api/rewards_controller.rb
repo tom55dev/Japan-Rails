@@ -1,4 +1,6 @@
 class Api::RewardsController < ApiController
+  before_action :authenticate_streaks_customer
+
   def redeem
     redeemer = RewardRedeemer.new(redeem_params.merge(shop: current_shop))
 
@@ -14,6 +16,12 @@ class Api::RewardsController < ApiController
   end
 
   private
+
+  def authenticate_streaks_customer
+    unless StreaksCustomerAuthenticator.new(customer_id: params[:customer_id], user_uuid: params[:user_uuid]).call
+      render json: { success: false, error: "Sorry, it looks like you aren't on a streak. If you've just started one please wait a few minutes and try again." }
+    end
+  end
 
   def redeem_params
     params.permit(:product_id, :variant_id, :customer_id).as_json.symbolize_keys
