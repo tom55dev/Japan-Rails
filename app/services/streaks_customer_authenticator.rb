@@ -1,13 +1,16 @@
 class StreaksCustomerAuthenticator
-  attr_reader :customer_id, :user_uuid
+  attr_reader :shop, :customer_id, :user_uuid
 
-  def initialize(customer_id:, user_uuid:)
+  def initialize(shop, customer_id:, user_uuid:)
+    @shop = shop
     @customer_id = customer_id
     @user_uuid = user_uuid
   end
 
   def call
-    user_uuid_matches? && active_streak_count.positive?
+    shop.with_shopify_session do
+      user_uuid_matches? && active_streak_count.positive?
+    end
   end
 
   private

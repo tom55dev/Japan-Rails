@@ -16,7 +16,7 @@ describe StreaksCustomerAuthenticator do
     end
   end
 
-  let!(:authenticator) { StreaksCustomerAuthenticator.new(customer_id: customer_id, user_uuid: user_uuid) }
+  let!(:authenticator) { StreaksCustomerAuthenticator.new(shop, customer_id: customer_id, user_uuid: user_uuid) }
 
   before do
     allow(ShopifyAPI::Metafield).to receive(:find).and_return(metafields)
@@ -37,7 +37,7 @@ describe StreaksCustomerAuthenticator do
   end
 
   context 'when the customer ID and uuid do not match' do
-    let!(:authenticator) { StreaksCustomerAuthenticator.new(customer_id: customer_id, user_uuid: 'something-else') }
+    let!(:authenticator) { StreaksCustomerAuthenticator.new(shop, customer_id: customer_id, user_uuid: 'something-else') }
 
     it 'returns false' do
       expect(authenticator.call).to eq false

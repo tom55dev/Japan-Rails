@@ -16,7 +16,7 @@ describe Api::RewardsController do
 
   before do
     allow(StreaksCustomerAuthenticator).to receive(:new).with(
-      customer_id: customer.remote_id, user_uuid: 'some-uuid'
+      shop, customer_id: customer.remote_id, user_uuid: 'some-uuid'
     ).and_return -> { true }
   end
 

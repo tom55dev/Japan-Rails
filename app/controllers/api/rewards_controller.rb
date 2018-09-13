@@ -18,7 +18,7 @@ class Api::RewardsController < ApiController
   private
 
   def authenticate_streaks_customer
-    unless StreaksCustomerAuthenticator.new(customer_id: params[:customer_id], user_uuid: params[:user_uuid]).call
+    unless StreaksCustomerAuthenticator.new(current_shop, customer_id: params[:customer_id], user_uuid: params[:user_uuid]).call
       render json: { success: false, error: "Sorry, it looks like you aren't on a streak. If you've just started one please wait a few minutes and try again." }
     end
   end
