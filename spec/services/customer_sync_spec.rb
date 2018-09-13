@@ -16,6 +16,8 @@ describe CustomerSync do
   end
 
   describe '#call' do
+    let!(:customer_sync) { CustomerSync.new(shop, customer_id: shopify_customer.id) }
+
     context 'when customer already exist' do
       before do
         create :customer, shop: shop, remote_id: shopify_customer.id
@@ -23,12 +25,12 @@ describe CustomerSync do
 
       it 'updates the customer' do
         expect_any_instance_of(Customer).to receive(:update!)
-        CustomerSync.new(shop, shopify_customer.id).call
+        customer_sync.call
       end
 
       it 'does not create a new customer' do
         expect {
-          CustomerSync.new(shop, shopify_customer.id).call
+          customer_sync.call
         }.to change(Customer, :count).by(0)
       end
     end
@@ -36,7 +38,7 @@ describe CustomerSync do
     context 'when customer does not exist' do
       it 'creates a new customer' do
         expect {
-          CustomerSync.new(shop, shopify_customer.id).call
+          customer_sync.call
         }.to change(Customer, :count).by(1)
       end
     end

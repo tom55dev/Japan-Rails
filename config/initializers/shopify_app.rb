@@ -16,6 +16,8 @@ ShopifyApp.configure do |config|
   # Webhooks
   webhook_url = File.join(Rails.application.secrets.website_url.to_s, 'api/webhooks')
   config.webhooks = [
+    { topic: 'customers/create', address: File.join(webhook_url, 'customers_sync') },
+    { topic: 'customers/update', address: File.join(webhook_url, 'customers_sync') },
     { topic: 'products/create', address: File.join(webhook_url, 'products_create') },
     { topic: 'products/update', address: File.join(webhook_url, 'products_update') },
     { topic: 'products/delete', address: File.join(webhook_url, 'products_delete') },

@@ -1,12 +1,9 @@
 class CustomerSync
   attr_reader :shop, :customer
 
-  def initialize(shop, customer_id)
+  def initialize(shop, customer_id: nil, shopify_customer: nil)
     @shop = shop
-
-    shop.with_shopify_session do
-      @customer = ShopifyAPI::Customer.find(customer_id)
-    end
+    @customer = shopify_customer || find_shopify_customer(customer_id)
   end
 
   def call
@@ -32,5 +29,11 @@ class CustomerSync
       last_name:    customer.last_name,
       orders_count: customer.orders_count
     }
+  end
+
+  def find_shopify_customer(customer_id)
+    shop.with_shopify_session do
+      ShopifyAPI::Customer.find(customer_id)
+    end
   end
 end

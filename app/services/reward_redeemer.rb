@@ -35,7 +35,7 @@ class RewardRedeemer
   end
 
   def customer
-    @customer ||= shop.customers.find_by(remote_id: customer_id)
+    @customer ||= CustomerFinder.new(shop, customer_id).call
   end
 
   def reward
