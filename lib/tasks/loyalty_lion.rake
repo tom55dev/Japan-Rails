@@ -21,7 +21,7 @@ namespace :loyalty_lion do
       {
         webhook: {
           topic: 'customers/update',
-          address: "#{Rails.application.secrets.website_url}/api/loyalty_lion/customer_updated?shop=#{shop_domain}"
+          address: "#{Rails.application.secrets.website_url}/api/loyalty_lion/customer_updated?shop=#{shop_domain}&api_key=#{Rails.application.secrets.api_key}"
         }
       }.to_json,
       content_type: :json
