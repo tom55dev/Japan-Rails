@@ -67,7 +67,7 @@ class RewardRedeemer
       @created_variant = remote_product.variants.find { |v| v.option1 == reward_variant.option1 }
       reward # creates a reward
 
-      { variant_id: created_variant.id, success: true, error: nil }
+      { variant_id: created_variant.id, remaining_quantity: remote_variant.inventory_quantity, success: true, error: nil }
     else
       # Rarely happens, usually if there's a concurrency request it will make the variant negative in quantity
       # There's also a possiblity this will happen if shopify receives too many request on the API

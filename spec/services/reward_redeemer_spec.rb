@@ -70,8 +70,8 @@ describe RewardRedeemer do
       expect(current_variant.inventory_quantity).to eq 9
     end
 
-    it 'returns a success=true and variant_id key' do
-      expect(redeemer.call).to eq({ variant_id: 'created_variant_id', success: true, error: nil })
+    it 'returns a success=true remaining_quantity, and variant_id key' do
+      expect(redeemer.call).to eq({ variant_id: 'created_variant_id', remaining_quantity: 9, success: true, error: nil })
     end
 
     it 'sets an expiration time for the reward' do
