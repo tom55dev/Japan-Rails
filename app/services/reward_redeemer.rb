@@ -22,6 +22,10 @@ class RewardRedeemer
         redeem!
       end
     end
+  rescue LoyaltyLion::CannotFetchPointsError => e
+    AppSignal.set_error(e)
+
+    { success: false, error: "Sorry, we couldn't confirm your eligibility. Please try again in a few minutes." }
   end
 
   private
