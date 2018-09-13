@@ -1,4 +1,6 @@
 class LoyaltyLion
+  class CannotFetchPointsError < StandardError; end
+
   attr_reader :customer
 
   def initialize(customer)
@@ -6,12 +8,11 @@ class LoyaltyLion
   end
 
   def points_approved
-    @points_approved ||= ShopifyAPI::Metafield.where(
-      resource: 'customers',
-      resource_id: customer.remote_id,
-      namespace: 'loyaltylion',
-      key: 'points_approved'
-    ).first&.value || 0
+    if customer.points_approved.blank?
+      customer.update!(points_approved: fetch_points_approved)
+    end
+
+    customer.points_approved || 0
   end
 
   def add(points:, product_name:)
@@ -29,9 +30,27 @@ class LoyaltyLion
   private
 
   def post_to_loyalty_lion(type, points, reason)
-    RestClient.post(api_url + '/' + type, { points: points, reason: reason }.to_json, { accept: 'json', content_type: 'json' }) do |response|
+    RestClient.post(customer_api_url + '/' + type, { points: points, reason: reason }.to_json, { accept: 'json', content_type: 'json' }) do |response|
       { success: response.code.between?(200, 209), error: error_msg(response) }
     end
+  end
+
+  def fetch_points_approved
+    RestClient.get(base_api_url + '/v2/customers', headers: { params: { email: customer.email } }) do |response|
+      if response.code.between?(200, 209)
+        find_customer_points(JSON.parse(response.body)['customers'])
+      else
+        raise CannotFetchPointsError, "Got a #{response.code} response: #{response.body}"
+      end
+    end
+  end
+
+  def find_customer_points(customers)
+    customer_data = customers.find { |data| data['merchant_id'].to_s == customer.remote_id }
+
+    raise CannotFetchPointsError, "Could not find #{customer.remote_id} in response for #{customer.email}" unless customer_data.present?
+
+    customer_data['points_approved']
   end
 
   def credentials
@@ -41,8 +60,12 @@ class LoyaltyLion
     ].join(':')
   end
 
-  def api_url
-    "https://#{credentials}@#{Rails.application.secrets.loyalty_lion_api_url}/v2/customers/#{customer.remote_id}"
+  def customer_api_url
+    "#{base_api_url}/v2/customers/#{customer.remote_id}"
+  end
+
+  def base_api_url
+    "https://#{credentials}@#{Rails.application.secrets.loyalty_lion_api_url}"
   end
 
   def error_msg(response)
