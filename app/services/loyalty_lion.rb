@@ -16,12 +16,16 @@ class LoyaltyLion
   end
 
   def add(points:, product_name:)
-    post_to_loyalty_lion('points', points, "Reward removed from cart: #{product_name}")
+    post_to_loyalty_lion('points', points, "Reward removed from cart: #{product_name}") do
+      update_customer_points(points)
+    end
   end
 
   def deduct(points:, product_name:)
     if points_approved >= points
-      post_to_loyalty_lion('remove_points', points, "Reward redeemed: #{product_name}")
+      post_to_loyalty_lion('remove_points', points, "Reward redeemed: #{product_name}") do
+        update_customer_points(-points)
+      end
     else
       { success: false, error: cannot_claim_reward_message }
     end
@@ -31,8 +35,18 @@ class LoyaltyLion
 
   def post_to_loyalty_lion(type, points, reason)
     RestClient.post(customer_api_url + '/' + type, { points: points, reason: reason }.to_json, { accept: 'json', content_type: 'json' }) do |response|
-      { success: response.code.between?(200, 209), error: error_msg(response) }
+      success = response.code.between?(200, 209)
+
+      yield if success
+
+      { success: success, error: error_msg(response) }
     end
+  end
+
+  def update_customer_points(amount)
+    # LoyaltyLion's webhook will update these if this fails for some reason
+    # We don't want to raise an error here and end up retrying and redoing the LoyaltyLion request
+    customer.update(points_approved: customer.points_approved + amount) if customer.points_approved.present?
   end
 
   def fetch_points_approved

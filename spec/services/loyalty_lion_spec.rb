@@ -12,12 +12,15 @@ describe LoyaltyLion do
   let!(:point_params) { { points: 500, product_name: 'test' } }
 
   describe '#add' do
-    it 'adds the points on customer\'s loyaltylion account' do
+    before { customer.update!(points_approved: 10000) }
+
+    it 'adds the points on customer\'s loyaltylion account and on the customer' do
       payload = { points: 500, reason: 'Reward removed from cart: test' }.to_json
       resp = double(:response, code: 201, body: '')
       expect(RestClient).to receive(:post).with(/points/, payload, { accept: 'json', content_type: 'json' }).and_yield(resp)
 
       loyalty_lion.add(point_params)
+      expect(customer.points_approved).to eq(10000 + 500)
     end
 
     it 'returns success=true' do
@@ -38,13 +41,14 @@ describe LoyaltyLion do
       expect(loyalty_lion.deduct(point_params)).to eq ({ success: true, error: nil })
     end
 
-    it 'deducts the points on customer\'s loyaltylion account' do
+    it 'deducts the points on customer\'s loyaltylion account and on the customer' do
       payload = { points: 500, reason: 'Reward redeemed: test' }.to_json
       resp = double(:response, code: 201, body: '')
 
       expect(RestClient).to receive(:post).with(/remove_points/, payload, { accept: 'json', content_type: 'json' }).and_yield(resp)
 
       loyalty_lion.deduct(point_params)
+      expect(customer.points_approved).to eq(10000 - 500)
     end
 
     context 'when points approved is not enough' do
