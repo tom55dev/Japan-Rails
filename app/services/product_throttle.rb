@@ -46,10 +46,19 @@ class ProductThrottle
 
   def sync_products(products)
     products.each do |product|
-      model = ProductSync.new(shop, product).call
+      begin
+        model = ProductSync.new(shop, product).call
 
-      product.variants.each do |variant|
-        ProductVariantSync.new(model, variant).call
+        product.variants.each do |variant|
+          ProductVariantSync.new(model, variant).call
+        end
+      rescue ActiveResource::ConnectionError, ActiveResource::ClientError => e
+        if e.response.code == 429
+          sleep 10
+          retry
+        else
+          raise e
+        end
       end
     end
   end
