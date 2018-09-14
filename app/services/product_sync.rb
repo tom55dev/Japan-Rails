@@ -40,20 +40,24 @@ class ProductSync
     }
   end
 
+  def filtered_variants
+    variants.reject{ |v| v.title.include?('Reward #') }
+  end
+
   def price_min
-    variant = variants.sort_by(&:price).first
+    variant = filtered_variants.sort_by(&:price).first
 
     variant.price if variant.present?
   end
 
   def compare_price_min
-    variant = variants.sort_by(&:compare_at_price).first
+    variant = filtered_variants.sort_by(&:compare_at_price).first
 
     variant.compare_at_price if variant.present?
   end
 
   def available?
-    variants.any? { |v| v.inventory_policy == 'deny' && v.inventory_quantity > 0 }
+    filtered_variants.any? { |v| v.inventory_policy == 'deny' && v.inventory_quantity > 0 }
   end
 
   def points_cost

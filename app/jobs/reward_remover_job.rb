@@ -1,11 +1,13 @@
 class RewardRemoverJob < ApplicationJob
-  attr_reader :reward, :remote_product, :customer
+  attr_reader :shop, :reward, :remote_product, :customer, :add_points
 
   queue_as :reward_sync
 
-  def perform(customer_id, product_id, variant_id)
-    @customer = Customer.find_by(remote_id: customer_id)
+  def perform(shop_id:, customer_id:, product_id:, variant_id:, add_points: true)
+    @shop = Shop.find(shop_id)
+    @customer = CustomerFinder.new(shop, customer_id).call
     @reward   = customer.rewards.find_by(redeemed_remote_variant_id: variant_id)
+    @add_points = add_points
 
     return if reward.blank?
 
@@ -26,7 +28,7 @@ class RewardRemoverJob < ApplicationJob
   end
 
   def variant
-    @variant ||= ProductVariant.find_by(remote_id: referenced_variant.id)
+    @variant ||= shop.product_variants.find_by(remote_id: referenced_variant.id)
   end
 
   def remove!
@@ -34,7 +36,7 @@ class RewardRemoverJob < ApplicationJob
     remote_product.variants.reject! { |v| v == redeemed_variant }
     remote_product.save!
 
-    loyalty_lion.add(points: variant.product.points_cost, product_name: variant.product.title)
+    loyalty_lion.add(points: variant.product.points_cost, product_name: variant.product.title) if add_points
     reward.destroy!
   end
 

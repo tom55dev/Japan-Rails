@@ -5,7 +5,16 @@ set :stages, %w[production staging]
 
 set :application, 'japanhaul-rails'
 set :repo_url, 'git@github.com:movefast-llc/japanhaul-rails.git'
-set :branch, 'master'
+
+set :branch do
+  branch = ENV['GIT_BRANCH']
+
+  if fetch(:stage) == :production && (branch.nil? || branch.empty?)
+    raise 'ERROR: You must provide branch when deploying into production!'
+  end
+
+  branch || 'master'
+end
 
 set :user, 'deployer'
 set :deploy_to, "/data/#{fetch(:application)}"

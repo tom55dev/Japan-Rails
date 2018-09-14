@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe RewardRedeemer do
   let!(:shop) { create :shop }
-  let!(:customer) { create :customer }
+  let!(:customer) { create :customer, shop: shop }
 
   before do
     ShopifyAPI::Base.activate_session(ShopifyAPI::Session.new(shop.shopify_domain, shop.shopify_token))
@@ -19,13 +19,14 @@ describe RewardRedeemer do
   let!(:redeemer) { RewardRedeemer.new(redeem_params) }
 
   before do
-    create :product, remote_id: shopify_product.id, points_cost: 500
+    create :product, shop: shop, remote_id: shopify_product.id, points_cost: 500
     current_variant.inventory_quantity = 10
     allow(ShopifyAPI::Product).to receive(:find).and_return(shopify_product)
     allow(shopify_product).to receive(:save).and_return(true)
     allow(redeemer).to receive(:loyalty_lion).and_return(loyalty_lion)
     allow(redeemer).to receive(:created_variant).and_return(ShopifyAPI::Variant.new(id: 'created_variant_id'))
     allow(RewardRemoverJob).to receive(:perform_later).and_return(true)
+    allow_any_instance_of(RewardExpiryJob).to receive(:perform).and_return(true)
   end
 
   describe '#call' do
@@ -69,8 +70,15 @@ describe RewardRedeemer do
       expect(current_variant.inventory_quantity).to eq 9
     end
 
-    it 'returns a success=true and variant_id key' do
-      expect(redeemer.call).to eq({ variant_id: 'created_variant_id', success: true, error: nil })
+    it 'returns a success=true remaining_quantity, and variant_id key' do
+      expect(redeemer.call).to eq({ variant_id: 'created_variant_id', remaining_quantity: 9, success: true, error: nil })
+    end
+
+    it 'sets an expiration time for the reward' do
+      expiry = class_double(RewardExpiryJob, perform_later: nil)
+      expect(RewardExpiryJob).to receive(:set).with(wait: 2.hours).and_return(expiry)
+
+      redeemer.call
     end
 
     context 'when variant save fails' do
@@ -99,7 +107,7 @@ describe RewardRedeemer do
       end
 
       it 'returns a success=false with error message' do
-        expect(redeemer.call).to eq ({ success: false, error: 'Oops, sorry you cannot redeem this product anymore.' })
+        expect(redeemer.call).to eq ({ success: false, error: 'Oops, sorry this product is out of stock.' })
       end
     end
 
@@ -117,7 +125,7 @@ describe RewardRedeemer do
       end
 
       it 'calls the reward remover job' do
-        expect(RewardRemoverJob).to receive(:perform_later).with(customer.remote_id, shopify_product.id, 'created_variant_id')
+        expect(RewardRemoverJob).to receive(:perform_later).with(shop_id: shop.id, customer_id: customer.remote_id, product_id: shopify_product.id, variant_id: 'created_variant_id', add_points: false)
 
         redeemer.call
       end
