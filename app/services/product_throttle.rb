@@ -53,7 +53,8 @@ class ProductThrottle
           ProductVariantSync.new(model, variant).call
         end
       rescue ActiveResource::ConnectionError, ActiveResource::ClientError => e
-        if e.response.code == 429
+        if e.response.code.to_s.include?('429')
+          puts 'Muted for 10 seconds to handle bucket overflow...'
           sleep 10
           retry
         else
