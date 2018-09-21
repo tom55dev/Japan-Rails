@@ -13,7 +13,7 @@ class Shopify::RefundsCreateJob < ApplicationJob
 
     remote = ShopifyAPI::Refund.new(args[:webhook])
 
-    reward_variant_ids = refund.refund_line_items.map do |line_item|
+    reward_variant_ids = remote.refund_line_items.map do |line_item|
       line_item.variant_id if line_item.variant_title.to_s.include?(REWARD_PREFIX)
     end.compact
 
