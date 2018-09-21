@@ -24,7 +24,7 @@ class Shopify::RefundsCreateJob < ApplicationJob
 
   def refund!(reward_variant_ids)
     Reward.where(redeemed_variant_id: reward_variant_ids).each do |reward|
-      next if reward.refunded?
+      next if reward.refunded_at?
       result = refund_points!(reward)
 
       if result[:success]
