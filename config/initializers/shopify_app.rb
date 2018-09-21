@@ -21,7 +21,8 @@ ShopifyApp.configure do |config|
     { topic: 'products/create', address: File.join(webhook_url, 'products_create') },
     { topic: 'products/update', address: File.join(webhook_url, 'products_update') },
     { topic: 'products/delete', address: File.join(webhook_url, 'products_delete') },
-    { topic: 'orders/paid', address: File.join(webhook_url, 'orders_paid') }
+    { topic: 'orders/paid', address: File.join(webhook_url, 'orders_paid') },
+    { topic: 'refunds/create', address: File.join(webhook_url, 'refunds_create') }
   ]
 
   config.after_authenticate_job = { job: Shopify::ShopSyncJob }

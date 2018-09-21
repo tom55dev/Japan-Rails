@@ -15,8 +15,8 @@ class LoyaltyLion
     customer.points_approved || 0
   end
 
-  def add(points:, product_name:)
-    post_to_loyalty_lion('points', points, "Reward removed from cart: #{product_name}") do
+  def add(points:, product_name:, action: 'removed from cart')
+    post_to_loyalty_lion('points', points, "Reward #{action}: #{product_name}") do
       update_customer_points(points)
     end
   end
