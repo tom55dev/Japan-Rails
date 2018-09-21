@@ -28,7 +28,7 @@ class Shopify::RefundsCreateJob < ApplicationJob
       result = refund_points!(reward)
 
       if result[:success]
-        reward.update!(:refunded_at: Time.zone.now)
+        reward.update!(refunded_at: Time.zone.now)
       else
         raise CannotRefundError.new(result[:error])
       end
