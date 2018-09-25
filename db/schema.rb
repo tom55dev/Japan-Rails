@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180913054109) do
+ActiveRecord::Schema.define(version: 20180921034459) do
 
   create_table "customers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "shop_id"
@@ -22,6 +22,7 @@ ActiveRecord::Schema.define(version: 20180913054109) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "points_approved"
+    t.index ["remote_id", "shop_id"], name: "index_customers_on_remote_id_and_shop_id", unique: true
     t.index ["remote_id"], name: "index_customers_on_remote_id"
     t.index ["shop_id"], name: "index_customers_on_shop_id"
   end
@@ -71,6 +72,7 @@ ActiveRecord::Schema.define(version: 20180913054109) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "purchased_at"
+    t.datetime "refunded_at"
     t.index ["customer_id"], name: "index_rewards_on_customer_id"
     t.index ["purchased_at"], name: "index_rewards_on_purchased_at"
     t.index ["redeemed_remote_variant_id"], name: "index_rewards_on_redeemed_remote_variant_id"
