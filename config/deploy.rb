@@ -66,3 +66,4 @@ end
 
 after 'deploy:publishing', 'deploy:restart'
 after 'deploy:restart', 'sidekiq:restart'
+after 'deploy:finished', 'custom:show_checklist'
