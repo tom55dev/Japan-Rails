@@ -11,6 +11,8 @@ describe RewardRedeemer do
   let!(:product_json) { JSON.parse(File.read('spec/fixtures/shopify_product.json')) }
   let!(:shopify_product) { ShopifyAPI::Product.new(product: product_json) }
   let!(:current_variant) { shopify_product.variants.first }
+  let!(:reward_variant) { ShopifyAPI::Variant.new(id: 'created_variant_id', title: 'Reward #123') }
+  let!(:remote_inventory_level) { ShopifyAPI::InventoryLevel.new(inventory_item_id: 'test_item_id', available: 0, location_id: '123') }
   let!(:redeem_params) do
     { shop: shop, customer_id: customer.remote_id, product_id: shopify_product.id, variant_id: current_variant.id }
   end
@@ -24,16 +26,20 @@ describe RewardRedeemer do
     allow(ShopifyAPI::Product).to receive(:find).and_return(shopify_product)
     allow(shopify_product).to receive(:save).and_return(true)
     allow(redeemer).to receive(:loyalty_lion).and_return(loyalty_lion)
-    allow(redeemer).to receive(:created_variant).and_return(ShopifyAPI::Variant.new(id: 'created_variant_id'))
+    allow(ShopifyAPI::Variant).to receive(:new).and_return(reward_variant)
+    allow(redeemer).to receive(:remote_inventory_level).and_return(remote_inventory_level)
     allow(RewardRemoverJob).to receive(:perform_later).and_return(true)
+
+    allow(reward_variant).to receive(:save).and_return(true)
+    allow(remote_inventory_level).to receive(:adjust)
     allow_any_instance_of(RewardExpiryJob).to receive(:perform).and_return(true)
   end
 
   describe '#call' do
     it 'creates a new variant with reward option' do
-      expect {
-        redeemer.call
-      }.to change(shopify_product.variants, :count).by(1)
+      expect(reward_variant).to receive(:save).and_return(true)
+
+      redeemer.call
     end
 
     it 'creates a reward model' do
@@ -43,14 +49,13 @@ describe RewardRedeemer do
     end
 
     it 'builds the correct variant' do
-      redeemer.call
-
-      expect(shopify_product.variants.last.attributes).to include({
+      expect(ShopifyAPI::Variant).to receive(:new).with({
         sku: 'DAG-BOU-BURGER-SOLTYCALAMEL',
         position: 1,
         inventory_policy: 'deny',
         fulfillment_service: 'manual',
         inventory_management: 'shopify',
+        product_id: shopify_product.id,
         weight: 87.0,
         weight_unit: 'g',
         image_id: nil,
@@ -62,12 +67,14 @@ describe RewardRedeemer do
           ShopifyAPI::Metafield.new(namespace: 'points_market', key: 'customer_id', value_type: 'integer', value: 123)
         ]
       })
+
+      redeemer.call
     end
 
     it 'reduces the selected variant inventory quantity' do
-      redeemer.call
+      expect(remote_inventory_level).to receive(:adjust).with(-1)
 
-      expect(current_variant.inventory_quantity).to eq 9
+      redeemer.call
     end
 
     it 'returns a success=true remaining_quantity, and variant_id key' do
@@ -83,7 +90,7 @@ describe RewardRedeemer do
 
     context 'when variant save fails' do
       before do
-        allow(shopify_product).to receive(:save).and_return(false)
+        allow(reward_variant).to receive(:save).and_return(false)
       end
 
       it 'returns a success=false with error message' do

@@ -93,7 +93,7 @@ class RewardRedeemer
     end
   rescue => e
     # Restores the remote variant (product) to its original state before redeeming
-    if e.response.code == 429
+    if e.respond_to?(:response) && e.response.code == 429
       if reward_variant.persisted?
         RewardRestorerJob.perform_later(
           shop_id: shop.id,
@@ -124,7 +124,7 @@ class RewardRedeemer
       shop_id: shop.id,
       customer_id: customer.remote_id,
       product_id: remote_product.id,
-      variant_id: created_variant.id,
+      variant_id: reward_variant.id,
       add_points: false
     )
   end
