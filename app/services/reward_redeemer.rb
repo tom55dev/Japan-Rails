@@ -1,7 +1,7 @@
 class RewardRedeemer
   EXPIRATION_TIME = 2.hours
 
-  attr_reader :shop, :product_id, :variant_id, :customer_id, :created_variant
+  attr_reader :shop, :product_id, :variant_id, :customer_id
 
   def initialize(shop:, product_id:, variant_id:, customer_id:)
     @shop = shop
@@ -39,13 +39,17 @@ class RewardRedeemer
     @remote_variant ||= remote_product.variants.find { |v| v.id == variant_id.to_i }
   end
 
+  def remote_inventory_level
+    @remote_inventory_level ||= ShopifyAPI::InventoryLevel.where(inventory_item_ids: remote_variant.inventory_item_id).first
+  end
+
   def customer
     @customer ||= CustomerFinder.new(shop, customer_id).call
   end
 
   def reward
     @reward ||= customer.rewards.create!(
-      redeemed_remote_variant_id: created_variant.id,
+      redeemed_remote_variant_id: reward_variant.id,
       referenced_remote_variant_id: remote_variant.id
     )
   end
@@ -65,19 +69,40 @@ class RewardRedeemer
   end
 
   def create_variant!
-    remote_variant.inventory_quantity -= 1
-    remote_product.variants << reward_variant
+    remote_inventory_level # Preload remote_inventory_level
+    remote_variant_deducted = false
 
-    if remote_product.save
-      @created_variant = remote_product.variants.find { |v| v.option1 == reward_variant.option1 }
-      reward
-      # check if quantity is negative?
+    if reward_variant.save
+      remote_variant_deducted = true if remote_inventory_level.adjust(-1)
 
-      { variant_id: created_variant.id, remaining_quantity: remote_variant.inventory_quantity, success: true, error: nil }
+      reward_inventory_level = ShopifyAPI::InventoryLevel.new(
+        inventory_item_id: reward_variant.inventory_item_id,
+        location_id: remote_inventory_level.location_id,
+        available: 0
+      )
+      reward_inventory_level.adjust(1)
+
+      { variant_id: reward_variant.id, remaining_quantity: (remote_variant.inventory_quantity - 1), success: true, error: nil }
     else
       # Rarely happens, usually if there's a concurrency request it will make the variant negative in quantity
       # There's also a possiblity this will happen if shopify receives too many request on the API
       { success: false, error: 'Sorry, a problem occured while claiming this product.' }
+    end
+  rescue => e
+    # Restores the remote variant (product) to its original state before redeeming
+    if e.response.code == 429
+      if reward_variant.persisted?
+        RewardRestorerJob.perform_later(
+          shop_id: shop.id,
+          remote_variant_id: remote_variant_id,
+          reward_variant_id: reward_variant.id,
+          remote_variant_deducted: remote_variant_deducted
+        )
+      end
+
+      { success: false, error: 'Sorry, a problem occured while claiming this product.' }
+    else
+      raise e
     end
   end
 
@@ -118,10 +143,10 @@ class RewardRedeemer
 
   def default_attrs
     {
+      product_id: remote_product.id,
       price: 0,
       compare_at_price: 0,
       option1: variant_title,
-      inventory_quantity: 1,
       metafields: [customer_metafield]
     }
   end
