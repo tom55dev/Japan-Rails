@@ -75,12 +75,12 @@ class RewardRedeemer
     if reward_variant.save
       remote_variant_deducted = true if remote_inventory_level.adjust(-1)
 
-      reward_inventory_level = ShopifyAPI::InventoryLevel.new(
-        inventory_item_id: reward_variant.inventory_item_id,
-        location_id: remote_inventory_level.location_id,
-        available: 0
-      )
-      reward_inventory_level.adjust(1)
+      #reward_inventory_level = ShopifyAPI::InventoryLevel.new(
+        #inventory_item_id: reward_variant.inventory_item_id,
+        #location_id: remote_inventory_level.location_id,
+        #available: 0
+      #)
+      #reward_inventory_level.adjust(1)
 
       { variant_id: reward_variant.id, remaining_quantity: (remote_variant.inventory_quantity - 1), success: true, error: nil }
     else
@@ -144,6 +144,7 @@ class RewardRedeemer
   def default_attrs
     {
       product_id: remote_product.id,
+      inventory_quantity: 1,
       price: 0,
       compare_at_price: 0,
       option1: variant_title,
