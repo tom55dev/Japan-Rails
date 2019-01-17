@@ -75,6 +75,9 @@ class RewardRedeemer
     if reward_variant.save
       remote_variant_deducted = true if remote_inventory_level.adjust(-1)
 
+      # Reward inventory level should be originally used for adjusting the reward,
+      # but since it works on create of the variant, i'll leave this for now
+
       #reward_inventory_level = ShopifyAPI::InventoryLevel.new(
         #inventory_item_id: reward_variant.inventory_item_id,
         #location_id: remote_inventory_level.location_id,
