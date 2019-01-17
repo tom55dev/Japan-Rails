@@ -24,22 +24,10 @@ describe RewardRemoverJob do
     allow(ShopifyAPI::Product).to receive(:find).and_return(shopify_product)
     allow(shopify_product).to receive(:save).and_return(true)
     allow(remover).to receive(:loyalty_lion).and_return(loyalty_lion)
+    allow(RewardRestorerJob).to receive(:perform_later)
   end
 
   describe '#perform' do
-    it 'increases the referenced variant quantity by 1' do
-      expect(referenced_variant.inventory_quantity).to eq 0
-      remover.perform(shop_id: shop.id, customer_id: customer.remote_id, product_id: shopify_product.id, variant_id: reward_variant.id)
-      expect(referenced_variant.inventory_quantity).to eq 1
-    end
-
-    it 'rejects the redeemed variant on the product' do
-      expect(shopify_product.variants).to include(reward_variant)
-      remover.perform(shop_id: shop.id, customer_id: customer.remote_id, product_id: shopify_product.id, variant_id: reward_variant.id)
-
-      expect(shopify_product.variants).not_to include(reward_variant)
-    end
-
     it 'adds the loyalty lion points back to the customer' do
       expect(loyalty_lion).to receive(:add).with(points: 500, product_name: shopify_product.title)
 

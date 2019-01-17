@@ -32,9 +32,12 @@ class RewardRemoverJob < ApplicationJob
   end
 
   def remove!
-    referenced_variant.inventory_quantity += 1 if redeemed_variant.present?
-    remote_product.variants.reject! { |v| v == redeemed_variant }
-    remote_product.save!
+    RewardRestorerJob.perform_later(
+      shop_id: shop.id,
+      remote_variant_id: referenced_variant.id,
+      reward_variant_id: redeemed_variant.id,
+      remote_variant_deducted: true
+    )
 
     loyalty_lion.add(points: variant.product.points_cost, product_name: variant.product.title) if add_points
     reward.destroy!

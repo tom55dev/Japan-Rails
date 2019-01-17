@@ -4,4 +4,4 @@ role :app, 'deployer@159.65.242.196'
 
 set :rail_env, :staging
 
-set :rvm_ruby_version, '2.3.0@japanhaul-rails'
+set :rvm_ruby_version, '2.3.1@japanhaul-rails'
