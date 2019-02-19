@@ -23,6 +23,10 @@ Rails.application.routes.draw do
     scope '/loyalty_lion', controller: :loyalty_lion do
       post :customer_updated
     end
+
+    scope '/contact', controller: :contact do
+      post :create_ticket
+    end
   end
 
   scope Rails.application.secrets.encrypted_path.to_s do
