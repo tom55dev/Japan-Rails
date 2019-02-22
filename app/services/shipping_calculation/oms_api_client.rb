@@ -2,9 +2,9 @@ module ShippingCalculation
   class OMSApiClient
     class Error < StandardError; end;
 
-    def initialize(api_key = "1x0JgXBhwlRrhuG4NM-JrEr0cQ0")
-      @api_key = api_key
-      @api_base = 'http://oms.test/api'
+    def initialize(api_key = "")
+      @api_key = Rails.application.secrets.oms_api_key
+      @api_base = Rails.application.secrets.oms_api_url
     end
 
     def calculate_shipping(country, items)
