@@ -100,3 +100,4 @@ gem 'appsignal'
 
 # Rest client
 gem 'rest-client'
+gem 'countries', '1.2.2', require: 'countries/global'
