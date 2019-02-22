@@ -9,10 +9,6 @@ module ShippingCalculation
       @total_price  = total_price
     end
 
-    def <=>(other)
-      total_price <=> other.total_price
-    end
-
     def represent
       {
         plan_name: plan_name,
@@ -25,7 +21,7 @@ module ShippingCalculation
     private
 
     def plan_name
-      reg_ex = /(.*)\s\|/
+      reg_ex = /(.*)\s\(/
       result = reg_ex.match(service_name)
       result && result[1]
     end

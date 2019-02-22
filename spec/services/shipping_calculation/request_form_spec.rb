@@ -6,7 +6,7 @@ describe ShippingCalculation::RequestForm do
   let!(:line_item_builder) { double(call: [line_item]) }
 
   before do
-    allow(ShippingCalculation::OMSApiClient).to receive(:new).and_return(client)
+    allow(ShippingCalculation::OMSCalculator).to receive(:new).and_return(client)
   end
 
   context 'when requested with grams unit' do
@@ -21,7 +21,7 @@ describe ShippingCalculation::RequestForm do
     it 'calls OMS api with correct params' do
       form = described_class.new(request_params)
       expect(ShippingCalculation::SampleLineItemBuilder).to receive(:new).with(weight_in_grams: 1).and_return(line_item_builder)
-      expect(client).to receive(:calculate_shipping).with(
+      expect(client).to receive(:call).with(
         'US',
         [line_item]
       ).and_return({'rates' => []})
@@ -42,7 +42,7 @@ describe ShippingCalculation::RequestForm do
       form = described_class.new(request_params)
       # 1 pound = 453.592 grams
       expect(ShippingCalculation::SampleLineItemBuilder).to receive(:new).with(weight_in_grams: 453.592).and_return(line_item_builder)
-      expect(client).to receive(:calculate_shipping).with(
+      expect(client).to receive(:call).with(
         'US',
         [line_item]
       ).and_return({'rates' => []})
@@ -63,7 +63,7 @@ describe ShippingCalculation::RequestForm do
       form = described_class.new(request_params)
       # 1 pound = 453.592 grams
       allow(ShippingCalculation::SampleLineItemBuilder).to receive(:new).and_return(line_item_builder)
-      allow(client).to receive(:calculate_shipping).and_raise(ShippingCalculation::OMSApiClient::Error)
+      allow(client).to receive(:call).and_return(false)
       form.create
       expect(form.errors[:base]).to be_present
     end

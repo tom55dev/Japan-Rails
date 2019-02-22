@@ -1,9 +1,8 @@
 class ShippingCalculation::RequestForm
   include ActiveModel::Model
-  DEFAULT_MAXIMUM_WEIGHT = 2000
   GRAMS_PER_POUND  = 453.592
 
-  attr_accessor :country, :state, :postal_code, :weight_unit, :weight_value, :rates
+  attr_accessor :country, :weight_unit, :weight_value, :rates
   validates :country, :weight_unit, :weight_value, presence: true
 
   def create
@@ -11,12 +10,14 @@ class ShippingCalculation::RequestForm
 
     items = ShippingCalculation::SampleLineItemBuilder.new(weight_in_grams: weight_in_grams).call
 
-    api_result = ShippingCalculation::OMSApiClient.new.calculate_shipping(country_code, items)
-    @rates = build_rates(api_result)
-    true
-  rescue ShippingCalculation::OMSApiClient::Error => e
-    errors.add(:base, 'Sorry, your request could not be submitted. Please try again later.')
-    false
+    api_result = ShippingCalculation::OMSCalculator.new.call(country_code, items)
+    if api_result
+      @rates = build_rates(api_result)
+      true
+    else
+      errors.add(:base, 'Sorry, your request could not be submitted. Please try again later.')
+      false
+    end
   end
 
   private
@@ -37,7 +38,7 @@ class ShippingCalculation::RequestForm
         currency: rate['currency'],
         total_price: rate['total_price']
       )
-    end.sort.map(&:represent)
+    end.sort_by(&:total_price).map(&:represent)
   end
 
   def country_code

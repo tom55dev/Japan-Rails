@@ -11,6 +11,6 @@ class Api::ShippingCalculationRequestsController < ApiController
   private
 
   def shipping_calculation_request_params
-    params.permit(:country, :state, :postal_code, :weight_unit, :weight_value)
+    params.permit(:country, :weight_unit, :weight_value)
   end
 end

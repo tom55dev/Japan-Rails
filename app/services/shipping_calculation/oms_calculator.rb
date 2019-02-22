@@ -1,5 +1,5 @@
 module ShippingCalculation
-  class OMSApiClient
+  class OMSCalculator
     class Error < StandardError; end;
 
     def initialize(api_key = "")
@@ -7,7 +7,7 @@ module ShippingCalculation
       @api_base = Rails.application.secrets.oms_api_url
     end
 
-    def calculate_shipping(country, items)
+    def call(country, items)
       path = '/shipping/calculator'
 
       resp = RestClient.post(
@@ -19,7 +19,7 @@ module ShippingCalculation
     rescue RestClient::ExceptionWithResponse => e
       raise e if Rails.env.development?
       Appsignal.set_error(e)
-      raise Error.new("OMS api error")
+      false
     end
 
     private
