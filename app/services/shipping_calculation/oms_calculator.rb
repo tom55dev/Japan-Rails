@@ -2,17 +2,21 @@ module ShippingCalculation
   class OMSCalculator
     class Error < StandardError; end;
 
-    def initialize(api_key = "")
+    attr_reader :country, :items
+
+    def initialize(country, items)
+      @country = country
+      @items = items
       @api_key = Rails.application.secrets.oms_api_key
       @api_base = Rails.application.secrets.oms_api_url
     end
 
-    def call(country, items)
+    def call
       path = '/shipping/calculator'
 
       resp = RestClient.post(
         api_url(path),
-        format_shipping_calc_params(country, items).to_json,
+        format_shipping_calc_params.to_json,
         {content_type: :json, accept: :json}
       )
       JSON.parse(resp.body)
@@ -24,7 +28,7 @@ module ShippingCalculation
 
     private
 
-    def format_shipping_calc_params(country, items)
+    def format_shipping_calc_params
       {
         rate: {
           destination: {

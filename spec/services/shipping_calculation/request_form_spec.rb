@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe ShippingCalculation::RequestForm do
-  let!(:client) { double }
+  let!(:client) { double(call: {'rates' => []}) }
   let!(:line_item) { instance_double(ShippingCalculation::DummyLineItem) }
   let!(:line_item_builder) { double(call: [line_item]) }
 
@@ -21,10 +21,10 @@ describe ShippingCalculation::RequestForm do
     it 'calls OMS api with correct params' do
       form = described_class.new(request_params)
       expect(ShippingCalculation::SampleLineItemBuilder).to receive(:new).with(weight_in_grams: 1).and_return(line_item_builder)
-      expect(client).to receive(:call).with(
+      expect(ShippingCalculation::OMSCalculator).to receive(:new).with(
         'US',
         [line_item]
-      ).and_return({'rates' => []})
+      ).and_return(client)
       form.create
     end
   end
@@ -42,10 +42,10 @@ describe ShippingCalculation::RequestForm do
       form = described_class.new(request_params)
       # 1 pound = 453.592 grams
       expect(ShippingCalculation::SampleLineItemBuilder).to receive(:new).with(weight_in_grams: 453.592).and_return(line_item_builder)
-      expect(client).to receive(:call).with(
+      expect(ShippingCalculation::OMSCalculator).to receive(:new).with(
         'US',
         [line_item]
-      ).and_return({'rates' => []})
+      ).and_return(client)
       form.create
     end
   end
@@ -63,6 +63,7 @@ describe ShippingCalculation::RequestForm do
       form = described_class.new(request_params)
       # 1 pound = 453.592 grams
       allow(ShippingCalculation::SampleLineItemBuilder).to receive(:new).and_return(line_item_builder)
+      allow(ShippingCalculation::OMSCalculator).to receive(:new).and_return(client)
       allow(client).to receive(:call).and_return(false)
       form.create
       expect(form.errors[:base]).to be_present

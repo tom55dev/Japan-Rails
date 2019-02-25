@@ -10,7 +10,7 @@ class ShippingCalculation::RequestForm
 
     items = ShippingCalculation::SampleLineItemBuilder.new(weight_in_grams: weight_in_grams).call
 
-    api_result = ShippingCalculation::OMSCalculator.new.call(country_code, items)
+    api_result = ShippingCalculation::OMSCalculator.new(country_code, items).call
     if api_result
       @rates = build_rates(api_result)
       true
