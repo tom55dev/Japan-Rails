@@ -27,6 +27,8 @@ Rails.application.routes.draw do
     scope '/contact', controller: :contact do
       post :create_ticket
     end
+
+    resource :shipping_calculation_requests, only: [:create]
   end
 
   scope Rails.application.secrets.encrypted_path.to_s do
