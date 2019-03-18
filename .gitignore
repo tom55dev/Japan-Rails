@@ -38,3 +38,4 @@
 dump.rdb
 *.sql
 latest.dump
+.vscode/
