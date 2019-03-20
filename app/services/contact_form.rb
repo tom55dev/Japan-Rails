@@ -12,7 +12,7 @@ class ContactForm
   }
 
   SHIPPING_PROBLEMS = {
-    'Box is not arrived yet' => { tag: 'late'    },
+    'Box is not arrived yet' => { tag: 'general' },
     'Missing item'           => { tag: 'damaged' },
     'Damaged item/box'       => { tag: 'damaged' },
     'Others'                 => { tag: 'others'  }
@@ -156,7 +156,7 @@ class ContactForm
    def zendesk_additional_tags
     tags = PURPOSES.dig(purpose, :additional_tags) || []
     tags << PURPOSES.dig(purpose, :problems, problem, :tag) if problem.present?
-    tags
+    tags.compact
   end
 
   def possible_problems
