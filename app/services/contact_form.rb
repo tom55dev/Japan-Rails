@@ -4,13 +4,6 @@ class ContactForm
 
   include ActiveModel::Model
 
-  # ID => Zendesk field value ("tag name")
-  BRANDS = {
-    tokyotreat: 'tt',
-    yumetwins: 'yt',
-    nomakenolife: 'nmnl'
-  }
-
   SHIPPING_PROBLEMS = {
     'Box is not arrived yet' => { tag: 'general' },
     'Missing item'           => { tag: 'damaged' },
