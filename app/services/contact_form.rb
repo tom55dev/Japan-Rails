@@ -13,15 +13,18 @@ class ContactForm
 
   PURPOSES = {
     'Shipping' => {
+      value: 'shipping',
       additional_tags: ['shipment'],
       additional_fields: [:account_email, :problem, :shipment_date, :received_date, :order_number],
       problems: SHIPPING_PROBLEMS
     },
     'Product' => {
+      value: 'product',
       additional_tags: ['questions', 'products'],
       additional_fields: []
     },
     'Reward Haul' => {
+      value: 'rewardhaul',
       additional_tags: [],
       additional_fields: []
     }
@@ -114,7 +117,7 @@ class ContactForm
 
   def zendesk_custom_field_params(custom_fields)
     custom_fields.map do |id, value|
-      { id: custom_field_ids[id], value: value }
+      { id: custom_field_ids[id], value: PURPOSES.dig(purpose, :value) }
     end
   end
 
@@ -199,7 +202,7 @@ class ContactForm
   end
 
   def zendesk_brand_id
-    'JapanHaul'
+    'jh'
   end
 
   def custom_field_ids

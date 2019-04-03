@@ -198,7 +198,7 @@ describe ContactForm do
     it 'includes custom purpose field based on secrets IDs' do
       expect(RestClient).to receive(:post).with(
         /requests.json/,
-        /"custom_fields".+\{"id":3,"value":"Product"\}/,
+        /"custom_fields".+\{"id":3,"value":"product"\}/,
         content_type: :json,
         accept: :json
       ).and_return(successful_response)
