@@ -96,7 +96,7 @@ class ContactForm
         custom_fields: zendesk_custom_field_params({
           purpose: PURPOSES.dig(purpose, :value),
           brand: zendesk_brand_id,
-          cateogry: zendesk_category_id
+          category: zendesk_category_id
         })
       }
     }
@@ -208,8 +208,6 @@ class ContactForm
   def custom_field_ids
     Rails.application.secrets.zendesk_custom_field_ids
   end
-
-  # private
 
   def additional_fields
     PURPOSES.dig(purpose, :additional_fields) || []
