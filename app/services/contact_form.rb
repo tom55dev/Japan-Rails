@@ -94,7 +94,7 @@ class ContactForm
 
         # Note: These custom fields on Zendesk must be editable by the customer, otherwise this anonymous API will silently ignore them
         custom_fields: zendesk_custom_field_params({
-          purpose: purpose,
+          purpose: PURPOSES.dig(purpose, :value),
           brand: zendesk_brand_id,
           cateogry: zendesk_category_id
         })
@@ -117,7 +117,7 @@ class ContactForm
 
   def zendesk_custom_field_params(custom_fields)
     custom_fields.map do |id, value|
-      { id: custom_field_ids[id], value: PURPOSES.dig(purpose, :value) }
+      { id: custom_field_ids[id], value: value }
     end
   end
 
