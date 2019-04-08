@@ -64,6 +64,7 @@ namespace :deploy do
   end
 end
 
+before 'bundler:install', 'custom:check_secrets_defined'
 after 'deploy:publishing', 'deploy:restart'
 after 'deploy:restart', 'sidekiq:restart'
 after 'deploy:finished', 'custom:show_checklist'

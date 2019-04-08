@@ -26,7 +26,7 @@ describe ContactForm do
       last_name: 'Customer',
       subject: 'Hello',
       message: 'Something',
-      purpose: 'Shipping'
+      purpose: 'Product'
     )
   end
 
@@ -81,6 +81,77 @@ describe ContactForm do
     end
   end
 
+  describe '#zendesk_body_fields' do
+    let!(:form) {
+      ContactForm.new(
+        email: 'test@example.com',
+        first_name: 'Test',
+        last_name: 'Customer',
+        subject: 'Hello',
+        message: 'Something',
+        purpose: 'Product'
+      )
+    }
+    context 'when there are no additional fields' do
+      it 'is blank' do
+        expect(form.zendesk_body_fields).to eq({})
+      end
+    end
+
+    context 'when there are additional fields' do
+      before do
+        form.purpose = 'Shipping'
+        form.account_email = 'test@example.com'
+        form.problem = ContactForm::SHIPPING_PROBLEMS.keys.first
+      end
+
+      it 'contains the fields' do
+        expect(form.zendesk_body_fields['Account Email']).to eq form.account_email
+        expect(form.zendesk_body_fields['Problem']).to eq form.problem
+      end
+    end
+  end
+
+  describe '#zendesk_additional_tags' do
+    let!(:form) {
+      ContactForm.new(
+        email: 'test@example.com',
+        first_name: 'Test',
+        last_name: 'Customer',
+        subject: 'Hello',
+        message: 'Something',
+        purpose: 'Product'
+      )
+    }
+
+    context 'when there are no additional tags' do
+      before { form.purpose = 'Reward Haul' }
+
+      it 'is empty' do
+        expect(form.zendesk_additional_tags).to be_empty
+      end
+    end
+
+    context 'when there are additional tags from the purpose' do
+      before { form.purpose = 'Shipping' }
+
+      it 'finds the tags' do
+        expect(form.zendesk_additional_tags).to contain_exactly('shipment')
+      end
+    end
+
+    context 'when there are additional tags from the problem type' do
+      before do
+        form.purpose = 'Shipping'
+        form.problem = 'Missing item'
+      end
+
+      it 'finds the tags' do
+        expect(form.zendesk_additional_tags).to contain_exactly('damaged', 'shipment')
+      end
+    end
+  end
+
   describe '#save' do
     let!(:successful_response) { double(:response, code: 201, body: { request: { id: 123 } }.to_json) }
 
@@ -127,7 +198,7 @@ describe ContactForm do
     it 'includes custom purpose field based on secrets IDs' do
       expect(RestClient).to receive(:post).with(
         /requests.json/,
-        /"custom_fields".+\{"id":3,"value":"Shipping"\}/,
+        /"custom_fields".+\{"id":3,"value":"product"\}/,
         content_type: :json,
         accept: :json
       ).and_return(successful_response)
