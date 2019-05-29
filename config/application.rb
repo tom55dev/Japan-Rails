@@ -38,5 +38,9 @@ module JapanhaulRails
     end
 
     config.time_zone = 'Tokyo'
+
+    # This will rotate to a maximum of 5 log file with
+    # a maximum size of 3 gigabytes each, (production: 15GB / 50GB)
+    config.logger = ActiveSupport::Logger.new(config.paths['log'].first, 4, 3.gigabytes)
   end
 end
