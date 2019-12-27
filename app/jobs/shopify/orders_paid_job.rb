@@ -11,8 +11,18 @@ class Shopify::OrdersPaidJob < ApplicationJob
 
       Reward.where(redeemed_remote_variant_id: variant_ids).each do |reward|
         reward.update(purchased_at: paid_at(order))
+        remove_reward_variant!(reward.redeemed_remote_variant_id)
       end
     end
+  end
+
+  private
+
+  def remove_reward_variant!(reward_variant_id)
+    variant = ShopifyAPI::Variant.find(reward_variant_id)
+    variant.destroy
+  rescue ActiveResource::ResourceNotFound => e
+    # Handles 404 to proceed
   end
 
   def paid_at(order)
