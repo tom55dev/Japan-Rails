@@ -1,6 +1,20 @@
-.row
-  - if flash[:error].present?
-    .alert.alert-danger
-      = flash[:error]
-  - else
-    %h2 Thank you for sending your response
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=utf-8", "http-equiv" => "Content-Type"}/
+    = stylesheet_link_tag 'application', "http://fonts.googleapis.com/css?family=Poppins"
+  %body{ style: "padding: 0; margin: 0; font-family: 'Poppins';"}
+    .navheader{ style: "background-color: #282828; width: 100%; height: 3rem; display: flex; align-items: center; justify-content:center; margin-bottom: 4rem;" }
+      = link_to 'https://japanhaul.com' do
+        = image_tag 'japanhaul_logo.svg', class: 'logo', style: "height: 2rem;"
+    .container
+      .message{ style: "display: flex; align-items: center; justify-content: center; flex-direction: column;" }
+        - if @error.present?
+          %h2{ style: "font-weight: bold;" }= @error
+        - else
+          %h2{ style: "font-weight: bold;" } Thank you!
+
+        %br
+        %p= @message
+        %br
+        = link_to 'Back to Homepage', 'https://japanhaul.com', style: "color: #e20030;"
