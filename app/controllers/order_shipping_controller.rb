@@ -1,4 +1,4 @@
-class OrderShippingController < ApiController
+class OrderShippingController < ApplicationController
   def new
     if call_api
       @message = confirmation_message
