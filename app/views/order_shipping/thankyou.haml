@@ -1,0 +1,6 @@
+.row
+  - if flash[:error].present?
+    .alert.alert-danger
+      = flash[:error]
+  - else
+    %h2 Thank you for sending your response

@@ -38,6 +38,8 @@ Rails.application.routes.draw do
     end
   end
 
+  get 'update_order_shipping', to: 'order_shipping#new'
+
   root to: redirect('http://japanhaul.com')
 
   post '/api/webhooks/:type', to: 'api/webhooks#receive', as: :api_webhook
