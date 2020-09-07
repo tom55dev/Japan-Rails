@@ -274,6 +274,8 @@ GEM
       rspec-mocks (~> 3.5.0)
       rspec-support (~> 3.5.0)
     rspec-support (3.5.0)
+    rspec_junit_formatter (0.4.1)
+      rspec-core (>= 2, < 4, != 2.12.0)
     ruby_dep (1.5.0)
     ruby_parser (3.11.0)
       sexp_processor (~> 4.9)
@@ -378,6 +380,7 @@ DEPENDENCIES
   redis-namespace
   rest-client
   rspec-rails (~> 3.5.0)
+  rspec_junit_formatter
   sass-rails (~> 5.0)
   selenium-webdriver (= 3.5.1)
   shopify_app
@@ -390,4 +393,4 @@ DEPENDENCIES
   web-console (>= 3.3.0)
 
 BUNDLED WITH
-   1.16.1
+   1.17.2
