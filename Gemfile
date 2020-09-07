@@ -58,6 +58,7 @@ group :test do
   gem 'capybara'
   gem 'selenium-webdriver', '3.5.1'
   gem 'poltergeist'
+  gem 'rspec_junit_formatter'
 end
 
 # Deployment dependencies
