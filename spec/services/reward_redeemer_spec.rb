@@ -10,9 +10,13 @@ describe RewardRedeemer do
 
   let!(:product_json) { JSON.parse(File.read('spec/fixtures/shopify_product.json')) }
   let!(:shopify_product) { ShopifyAPI::Product.new(product: product_json) }
+
   let!(:current_variant) { shopify_product.variants.first }
-  let!(:reward_variant) { ShopifyAPI::Variant.new(id: 'created_variant_id', title: 'Reward #123') }
   let!(:remote_inventory_level) { ShopifyAPI::InventoryLevel.new(inventory_item_id: 'test_item_id', available: 0, location_id: '123') }
+
+  let!(:reward_variant) { ShopifyAPI::Variant.new(id: 'created_variant_id', title: 'Reward #123', inventory_item_id: 'created_item_id') }
+  let!(:reward_inventory_level) { ShopifyAPI::InventoryLevel.new(inventory_item_id: 'created_item_id', available: 0, location_id: '123') }
+
   let!(:redeem_params) do
     { shop: shop, customer_id: customer.remote_id, product_id: shopify_product.id, variant_id: current_variant.id }
   end
@@ -25,9 +29,14 @@ describe RewardRedeemer do
     current_variant.inventory_quantity = 10
     allow(ShopifyAPI::Product).to receive(:find).and_return(shopify_product)
     allow(shopify_product).to receive(:save).and_return(true)
-    allow(redeemer).to receive(:loyalty_lion).and_return(loyalty_lion)
-    allow(ShopifyAPI::Variant).to receive(:new).and_return(reward_variant)
     allow(redeemer).to receive(:remote_inventory_level).and_return(remote_inventory_level)
+
+    allow(redeemer).to receive(:loyalty_lion).and_return(loyalty_lion)
+
+    allow(ShopifyAPI::Variant).to receive(:new).and_return(reward_variant)
+    allow(ShopifyAPI::InventoryLevel).to receive(:new).and_return(reward_inventory_level)
+    allow(reward_inventory_level).to receive(:adjust)
+
     allow(RewardRemoverJob).to receive(:perform_later).and_return(true)
 
     allow(reward_variant).to receive(:save).and_return(true)
@@ -62,7 +71,6 @@ describe RewardRedeemer do
         price: 0,
         compare_at_price: 0,
         option1: /Reward #/,
-        inventory_quantity: 1,
         metafields: [
           ShopifyAPI::Metafield.new(namespace: 'points_market', key: 'customer_id', value_type: 'integer', value: 123)
         ]
@@ -73,6 +81,12 @@ describe RewardRedeemer do
 
     it 'reduces the selected variant inventory quantity' do
       expect(remote_inventory_level).to receive(:adjust).with(-1)
+
+      redeemer.call
+    end
+
+    it 'increases the reward variant inventory quantity' do
+      expect(reward_inventory_level).to receive(:adjust).with(1)
 
       redeemer.call
     end
