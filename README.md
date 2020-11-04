@@ -47,7 +47,7 @@ Setup database
 $ bundle exec rake db:setup
 ```
 
-### Populating database
+### Populating the database
 Follow this link and get a database dump for JH to use locally. If you do not have access to this folder please ask another dev.
 https://drive.google.com/drive/folders/1QDGCZQAzlsD0Dq2QQhAsiYpYT_Km7mpS?usp=sharing
 
