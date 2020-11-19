@@ -1,0 +1,74 @@
+name: Rails CI
+
+on: [push]
+
+jobs:
+  test:
+    name: RSpec Tests
+
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+
+    env:
+      RAILS_ENV: test
+
+    steps:
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.4'
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+
+      - name: Start MySQL
+        run: sudo systemctl start mysql.service
+
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v2
+        with:
+          path: '**/vendor/bundle'
+          key: ${{ runner.os }}-bundle-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bundle-
+
+      - name: Install dependencies
+        run: |
+          gem install bundler:1.17.3
+          bundle install --path=vendor/bundle --without=development
+
+      - name: Copy secrets.ci.yml
+        run: cp config/secrets.ci.yml config/secrets.yml
+
+      - name: Database setup
+        run: |
+          cp config/database.ci.yml config/database.yml
+          bundle exec rails db:create
+          bundle exec rails db:test:prepare
+
+      - name: Run rspec in parallel
+        run: |
+          bundle exec rspec --profile 10 \
+                            --format RspecJunitFormatter \
+                            --out test_results/rspec.xml \
+                            --format progress
+        env:
+          REDIS_URL: redis://redis:${{ job.services.redis.ports[6379] }}
+
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: capybara
+          path: tmp/capybara
+
+      - name: Publish test results
+        uses: binary-koan/action-junit-report@47fb54b
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          report_paths: test_results/**/*.xml
