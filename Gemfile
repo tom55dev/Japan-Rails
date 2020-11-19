@@ -55,9 +55,6 @@ group :test do
   # Database cleaner for test
   gem 'database_cleaner'
   # Integration testing gems
-  gem 'capybara'
-  gem 'selenium-webdriver', '3.5.1'
-  gem 'poltergeist'
   gem 'rspec_junit_formatter'
 end
 
