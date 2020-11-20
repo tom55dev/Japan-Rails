@@ -1,6 +1,8 @@
 # JapanHaul Rails
 Managing backend API for Japan Haul frontend.
 
+![Rails CI](https://github.com/movefast-llc/japanhaul-rails/workflows/Rails%20CI/badge.svg)
+
 ## Stacks
 * Ruby 2.3.x
 * Rails 5.1.2
