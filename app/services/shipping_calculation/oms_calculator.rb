@@ -12,7 +12,7 @@ module ShippingCalculation
     end
 
     def call
-      path = '/shipping/calculator'
+      path = '/shopify/webhooks/shipping_methods/calculate'
 
       resp = RestClient.post(
         api_url(path),
