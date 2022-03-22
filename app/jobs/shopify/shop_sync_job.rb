@@ -4,6 +4,6 @@ class Shopify::ShopSyncJob < ApplicationJob
   def perform(args = {})
     shop = Shop.find_by(shopify_domain: args[:shop_domain])
 
-    ProductThrottle.new(shop).call
+    SyncAllProducts.new(shop).call
   end
 end

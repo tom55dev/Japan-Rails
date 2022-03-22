@@ -29,7 +29,7 @@ class OrderShippingController < ApplicationController
     response.status == 200
   rescue RestClient::ExceptionWithResponse => e
     raise e if Rails.env.development?
-    Appsignal.set_error(e)
+    Sentry.capture_exception(e)
     false
   end
 
@@ -46,10 +46,10 @@ class OrderShippingController < ApplicationController
   end
 
   def api_key
-    Rails.application.secrets.oms_api_key
+    Rails.application.credentials.oms_api_key
   end
 
   def api_base
-    Rails.application.secrets.oms_api_url
+    Rails.application.credentials.oms_api_url
   end
 end

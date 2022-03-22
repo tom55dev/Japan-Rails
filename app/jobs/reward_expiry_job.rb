@@ -7,8 +7,10 @@ class RewardExpiryJob < ApplicationJob
 
     reward.customer.shop.with_shopify_session do
       variant = ShopifyAPI::Variant.find(reward.redeemed_remote_variant_id)
+      inventory_level = ShopifyAPI::InventoryLevel.where(inventory_item_ids: variant.inventory_item_id).first
 
-      return if variant.inventory_quantity.zero? # Double check if variant was actually used in an order and skip this job
+      # Double check if variant was actually used in an order and skip this job
+      return if inventory_level.blank? || inventory_level.available.blank? || inventory_level.available.zero?
 
       RewardRemoverJob.new.perform(
         shop_id: reward.customer.shop_id,

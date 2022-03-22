@@ -1,11 +1,16 @@
 require 'rails_helper'
 
 describe RewardExpiryJob do
-  let!(:variant) { ShopifyAPI::Variant.new(id: '0', product_id: '0', inventory_quantity: 1) }
+  let!(:shop) { create :shop }
+  let!(:variant) { ShopifyAPI::Variant.new(id: '0', product_id: '0', inventory_item_id: '0') }
+  let!(:inventory_level) { ShopifyAPI::InventoryLevel.new(inventory_item_id: '0', available: 1) }
   let!(:reward) { create :reward, redeemed_remote_variant_id: variant.id }
 
   before do
+    ShopifyAPI::Base.activate_session(ShopifyAPI::Session.new(domain: shop.shopify_domain, token: shop.shopify_token, api_version: ShopifyApp.configuration.api_version))
+
     allow(ShopifyAPI::Variant).to receive(:find).and_return(variant)
+    allow(ShopifyAPI::InventoryLevel).to receive(:find).and_return([inventory_level])
     allow_any_instance_of(RewardRemoverJob).to receive(:perform)
   end
 
@@ -27,7 +32,7 @@ describe RewardExpiryJob do
     end
 
     context 'when quantity of variant is zero' do
-      before { variant.inventory_quantity = 0 }
+      before { inventory_level.available = 0 }
 
       it 'does nothing' do
         expect_any_instance_of(RewardRemoverJob).not_to receive(:perform)

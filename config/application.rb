@@ -32,7 +32,7 @@ module JapanhaulRails
 
     config.middleware.insert_before 0, Rack::Cors do
       allow do
-        origins *Rails.application.secrets.whitelisted_domains
+        origins *Rails.application.credentials.whitelisted_domains
         resource '*', :headers => :any, :methods => [:get, :post, :delete, :put, :options], :expose => ['Authorization'], credentials: true
       end
     end

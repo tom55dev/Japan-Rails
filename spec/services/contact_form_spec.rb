@@ -31,7 +31,7 @@ describe ContactForm do
   end
 
   before do
-    allow(Rails.application.secrets).to receive(:zendesk_custom_field_ids).and_return(
+    allow(Rails.application.credentials).to receive(:zendesk_custom_field_ids).and_return(
       brand: 1,
       category: 2,
       purpose: 3

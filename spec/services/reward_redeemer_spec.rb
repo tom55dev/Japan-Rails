@@ -5,7 +5,7 @@ describe RewardRedeemer do
   let!(:customer) { create :customer, shop: shop }
 
   before do
-    ShopifyAPI::Base.activate_session(ShopifyAPI::Session.new(shop.shopify_domain, shop.shopify_token))
+    ShopifyAPI::Base.activate_session(ShopifyAPI::Session.new(domain: shop.shopify_domain, token: shop.shopify_token, api_version: ShopifyApp.configuration.api_version))
   end
 
   let!(:product_json) { JSON.parse(File.read('spec/fixtures/shopify_product.json')) }
@@ -26,7 +26,7 @@ describe RewardRedeemer do
 
   before do
     create :product, shop: shop, remote_id: shopify_product.id, points_cost: 500
-    current_variant.inventory_quantity = 10
+    remote_inventory_level.available = 10
     allow(ShopifyAPI::Product).to receive(:find).and_return(shopify_product)
     allow(shopify_product).to receive(:save).and_return(true)
     allow(redeemer).to receive(:remote_inventory_level).and_return(remote_inventory_level)
@@ -124,7 +124,7 @@ describe RewardRedeemer do
 
     context 'when inventory quantity is zero' do
       before do
-        current_variant.inventory_quantity = 0
+        remote_inventory_level.available = 0
       end
 
       it 'returns a success=false with error message' do

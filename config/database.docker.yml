@@ -1,0 +1,12 @@
+default: &default
+  adapter: mysql2
+  url: <%= ENV['MYSQL_URL'] %>
+
+development:
+  <<: *default
+
+staging:
+  <<: *default
+
+production:
+  <<: *default

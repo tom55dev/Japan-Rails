@@ -31,7 +31,7 @@ Rails.application.routes.draw do
     resource :shipping_calculation_requests, only: [:create]
   end
 
-  scope Rails.application.secrets.encrypted_path.to_s do
+  scope Rails.application.credentials.encrypted_path.to_s do
     resources :home, path: '/', only: [:index]
     resource :special_offer, only: [:edit, :update] do
       get :search
@@ -44,7 +44,7 @@ Rails.application.routes.draw do
 
   post '/api/webhooks/:type', to: 'api/webhooks#receive', as: :api_webhook
 
-  mount ShopifyApp::Engine, at: Rails.application.secrets.encrypted_path.to_s
+  mount ShopifyApp::Engine, at: Rails.application.credentials.encrypted_path.to_s
 
   get '*path' => redirect('http://japanhaul.com')
 end

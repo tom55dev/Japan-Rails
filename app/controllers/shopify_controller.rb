@@ -4,6 +4,6 @@ class ShopifyController < ShopifyApp::AuthenticatedController
   protected
 
   def current_shop
-    @current_shop ||= Shop.find_by(shopify_domain: @shop_session.url)
+    @current_shop ||= Shop.find_by(shopify_domain: @shop_session.domain)
   end
 end

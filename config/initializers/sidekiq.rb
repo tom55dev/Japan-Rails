@@ -1,5 +1,5 @@
 redis_opt = {
-  url: 'redis://localhost:6379/0', namespace: "sidekiq_japanhaul-rails_#{Rails.env}"
+  url: ENV['REDIS_URL'] || 'redis://localhost:6379/0', namespace: "sidekiq_japanhaul-rails_#{Rails.env}"
 }
 
 Sidekiq.configure_server do |config|

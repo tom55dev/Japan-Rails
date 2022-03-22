@@ -5,7 +5,7 @@ describe RewardRemoverJob do
   let!(:customer) { create :customer, shop: shop }
 
   before do
-    ShopifyAPI::Base.activate_session(ShopifyAPI::Session.new(shop.shopify_domain, shop.shopify_token))
+    ShopifyAPI::Base.activate_session(ShopifyAPI::Session.new(domain: shop.shopify_domain, token: shop.shopify_token, api_version: ShopifyApp.configuration.api_version))
   end
 
   let!(:loyalty_lion) { instance_double(LoyaltyLion, points_approved: 1000, add: { success: true }) }

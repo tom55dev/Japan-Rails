@@ -7,10 +7,6 @@
 # Ignore bundler config.
 /.bundle
 
-# Ignore the default SQLite database.
-/db/*.sqlite3
-/db/*.sqlite3-journal
-
 # Ignore all logfiles and tempfiles.
 /log/*
 /tmp/*
@@ -22,21 +18,42 @@
 
 .rvmrc
 .rbenv*
-.ruby-version
 .ruby-gemset
 .vimrc
 .powrc
 .DS_Store
 /config/database.yml
+/config/secrets.yml
 /public/uploads/
+/public/system/
 /public/assets/
-/public/pmail/tmp/*
 
-# common dump files
 dump.rdb
-*.sql
-latest.dump
-.vscode/
+/public/packs
+/public/packs-test
+/node_modules
+/yarn-error.log
+**/yarn-debug.log*
+**/.yarn-integrity
 
+# Ignore local configuration
+/config/local.rb
+
+# Editor-specific config
+/.vscode
+/.idea
+
+# Direnv
+.envrc
+
+# Locally installed gems
+vendor/bundle/
+
+# Credential keys (except test, which is not sensitive and needed for CI)
 /config/credentials/*.key
 !/config/credentials/test.key
+
+# Ignore pidfiles, but keep the directory.
+/tmp/pids/*
+!/tmp/pids/
+!/tmp/pids/.keep

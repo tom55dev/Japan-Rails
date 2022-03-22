@@ -57,7 +57,11 @@ class ProductSync
   end
 
   def available?
-    filtered_variants.any? { |v| v.inventory_policy == 'deny' && v.inventory_quantity > 0 }
+    filtered_variants.any? { |v| v.inventory_policy == 'deny' && inventory_level(v) > 0 }
+  end
+
+  def inventory_level(variant)
+    ShopifyAPI::InventoryLevel.where(inventory_item_ids: variant.inventory_item_id)&.first&.available || 0
   end
 
   def points_cost

@@ -7,7 +7,7 @@ class Shopify::RefundsCreateJob < ApplicationJob
   def perform(args = {})
     shop = Shop.find_by(shopify_domain: args[:shop_domain])
 
-    access = ShopifyAPI::Session.new(shop.shopify_domain, shop.shopify_token)
+    access = ShopifyAPI::Session.new(domain: shop.shopify_domain, token: shop.shopify_token, api_version: ShopifyApp.configuration.api_version)
 
     ShopifyAPI::Base.activate_session(access)
 

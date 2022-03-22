@@ -4,10 +4,10 @@ class ApiController < ActionController::API
   protected
 
   def valid_request?
-    whitelisted = Rails.application.secrets.whitelisted_domains
+    whitelisted = Rails.application.credentials.whitelisted_domains
 
     unless Rails.env.development? || Rails.env.test? ||
-        params[:api_key] == Rails.application.secrets.api_key ||
+        params[:api_key] == Rails.application.credentials.api_key ||
         (current_shop.present? && request.origin.present? && whitelisted.include?(URI.parse(request.origin).host))
       render json: { msg: 'Sorry, you don\'t have any access to this website.' }, status: 403
     end

@@ -62,7 +62,7 @@ class ContactForm
     true
   rescue RestClient::ExceptionWithResponse => e
     raise if Rails.env.development?
-    Appsignal.set_error(e)
+    Sentry.capture_exception(e)
 
     errors.add(:base, 'Sorry, your request could not be submitted. Please try again later.')
     false
@@ -77,11 +77,11 @@ class ContactForm
   end
 
   def api_base_url
-    "#{Rails.application.secrets.zendesk_url}/api/v2"
+    "#{Rails.application.credentials.zendesk_url}/api/v2"
   end
 
   def api_authorization
-    auth = "#{Rails.application.secrets.zendesk_email}/token:#{Rails.application.secrets.zendesk_token}"
+    auth = "#{Rails.application.credentials.zendesk_email}/token:#{Rails.application.credentials.zendesk_token}"
     "Basic #{Base64.urlsafe_encode64(auth)}"
   end
 
@@ -132,7 +132,7 @@ class ContactForm
     raise if Rails.env.development?
     # Better to tell the user the ticket was created and let support request the attachments
     # separately than raise an error and end up with users spamming heaps of tickets
-    Appsignal.set_error(e)
+    Sentry.capture_exception(e)
   end
 
   def add_additional_tags(ticket_id)
@@ -206,7 +206,7 @@ class ContactForm
   end
 
   def custom_field_ids
-    Rails.application.secrets.zendesk_custom_field_ids
+    Rails.application.credentials.zendesk_custom_field_ids
   end
 
   def additional_fields

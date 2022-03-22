@@ -14,7 +14,7 @@ class RewardRedeemer
     shop.with_shopify_session do
       if product_points_cost <= 0
         { success: false, error: 'Oops, sorry you cannot redeem this product anymore.' }
-      elsif remote_variant.inventory_quantity <= 0
+      elsif remote_inventory_level.available.blank? || remote_inventory_level.available <= 0
         { success: false, error: 'Oops, sorry this product is out of stock.' }
       elsif loyalty_lion.points_approved < product_points_cost
         { success: false, error: 'Sorry, you don\'t have enough points to redeem this product.' }
@@ -24,7 +24,7 @@ class RewardRedeemer
       end
     end
   rescue LoyaltyLion::CannotFetchPointsError => e
-    AppSignal.set_error(e)
+    Sentry.capture_exception(e)
 
     { success: false, error: "Sorry, we couldn't confirm your eligibility. Please try again in a few minutes." }
   end
@@ -82,7 +82,7 @@ class RewardRedeemer
       )
       reward_inventory_level.adjust(1)
 
-      { variant_id: reward_variant.id, remaining_quantity: (remote_variant.inventory_quantity - 1), success: true, error: nil }
+      { variant_id: reward_variant.id, remaining_quantity: (remote_inventory_level.available - 1), success: true, error: nil }
     else
       # Rarely happens, usually if there's a concurrency request it will make the variant negative in quantity
       # There's also a possiblity this will happen if shopify receives too many request on the API

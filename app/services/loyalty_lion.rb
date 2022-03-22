@@ -50,7 +50,7 @@ class LoyaltyLion
   end
 
   def fetch_points_approved
-    RestClient.get(base_api_url + '/v2/customers', headers: { params: { email: customer.email } }) do |response|
+    RestClient.get("#{base_api_url}/v2/customers?email=#{CGI.escape(customer.email)}") do |response|
       if response.code.between?(200, 209)
         find_customer_points(JSON.parse(response.body)['customers'])
       else
@@ -69,8 +69,8 @@ class LoyaltyLion
 
   def credentials
     [
-      Rails.application.secrets.loyalty_lion_api_token,
-      Rails.application.secrets.loyalty_lion_api_secret
+      Rails.application.credentials.loyalty_lion_api_token,
+      Rails.application.credentials.loyalty_lion_api_secret
     ].join(':')
   end
 
@@ -79,7 +79,7 @@ class LoyaltyLion
   end
 
   def base_api_url
-    "https://#{credentials}@#{Rails.application.secrets.loyalty_lion_api_url}"
+    "https://#{credentials}@#{Rails.application.credentials.loyalty_lion_api_url}"
   end
 
   def error_msg(response)

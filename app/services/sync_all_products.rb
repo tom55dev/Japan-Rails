@@ -1,4 +1,4 @@
-class ProductThrottle
+class SyncAllProducts
   CYCLE = 0.5
 
   attr_reader :shop
@@ -6,7 +6,7 @@ class ProductThrottle
   def initialize(shop)
     @shop = shop
 
-    access = ShopifyAPI::Session.new(shop.shopify_domain, shop.shopify_token)
+    access = ShopifyAPI::Session.new(domain: shop.shopify_domain, token: shop.shopify_token, api_version: ShopifyApp.configuration.api_version)
 
     ShopifyAPI::Base.activate_session(access)
   end
@@ -23,8 +23,12 @@ class ProductThrottle
     # Initializing
     start_time = Time.now
 
-    1.upto(total_pages_count) do |page|
-      unless page == 1
+    products = ShopifyAPI::Product.find(:all, params: { limit: 250 })
+    first = true
+
+    loop do
+      if !first
+        first = false
         stop_time = Time.now
         puts "Last batch processing started at #{start_time.strftime('%I:%M:%S%p')}"
         puts "The time is now #{stop_time.strftime('%I:%M:%S%p')}"
@@ -37,10 +41,13 @@ class ProductThrottle
         start_time = Time.now
       end
 
-      puts "Doing page #{page}/#{total_pages_count}..."
-      products = ShopifyAPI::Product.find(:all, params: { limit: 250, page: page })
-
       sync_products(products)
+
+      if products.next_page?
+        products = products.fetch_next_page
+      else
+        break
+      end
     end
   end
 
@@ -52,9 +59,9 @@ class ProductThrottle
         product.variants.each do |variant|
           ProductVariantSync.new(model, variant).call
         end
-      rescue ActiveResource::ConnectionError, ActiveResource::ClientError => e
-        if e.response.code.to_s.include?('429')
-          puts 'Muted for 10 seconds to handle bucket overflow...'
+      rescue ActiveResource::ConnectionError, ActiveResource::ClientError, ActiveResource::ServerError => e
+        if e.response.code.to_s == '429' || e.response.code.to_s == '503'
+          puts "Muted for 10 seconds to handle #{e.response.code} response..."
           sleep 10
           retry
         else

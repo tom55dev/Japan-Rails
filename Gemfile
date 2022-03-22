@@ -7,7 +7,7 @@ end
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.1.2'
+gem 'rails', '~> 6.0.3'
 # Use MySQL2 for database
 gem 'mysql2'
 # Use Puma as the app server
@@ -19,17 +19,17 @@ gem 'uglifier', '>= 1.3.0'
 # See https://github.com/rails/execjs#readme for more supported runtimes
 # gem 'therubyracer', platforms: :ruby
 
+# Reduces boot times through caching; required in config/boot.rb
+gem 'bootsnap', '>= 1.1.0', require: false
+
 # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
 gem 'jbuilder', '~> 2.5'
 
-gem 'jquery-rails'
+gem 'jquery-rails', '~> 4.3'
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 3.0'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
-
-# Use Capistrano for deployment
-# gem 'capistrano-rails', group: :development
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -44,7 +44,7 @@ end
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> anywhere in the code.
-  gem 'web-console', '>= 3.3.0'
+  gem 'web-console', '>= 4.0.1'
   gem 'listen', '>= 3.0.5', '< 3.2'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
@@ -58,32 +58,23 @@ group :test do
   gem 'rspec_junit_formatter'
 end
 
-# Deployment dependencies
-group :development do
-  gem 'capistrano-rails', '~> 1.1', require: false
-  gem 'capistrano-bundler', '~> 1.1', require: false
-  gem 'capistrano-rvm', require: false
-  gem 'capistrano3-puma', '1.2.1', require: false
-  gem 'capistrano-sidekiq', require: false
-end
-
-source 'http://rails-assets.org' do
+source 'https://rails-assets.org' do
   gem 'rails-assets-bootstrap'
   gem 'rails-assets-selectize'
   gem 'rails-assets-onmount'
 end
 
 # HAML integration
-gem 'haml-rails', '~> 1.0'
+gem 'haml-rails', '~> 2.0'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # Shopify APP
-gem 'shopify_app'
+gem 'shopify_app', '~> 12.0'
 
 # Background Job
-gem 'sidekiq'
+gem 'sidekiq', '~> 5.1'
 gem 'sidekiq-failures'
 gem 'redis-namespace'
 
@@ -93,9 +84,10 @@ gem 'jsonapi-rails'
 # RACK CORS for HTTPS Allow-Access-Control-Origin
 gem 'rack-cors'
 
-# App tracker
-gem 'appsignal'
+# Error monitoring
+gem 'sentry-ruby'
+gem 'sentry-rails'
 
 # Rest client
-gem 'rest-client'
+gem 'rest-client', '~> 2.0'
 gem 'countries', '1.2.2', require: 'countries/global'

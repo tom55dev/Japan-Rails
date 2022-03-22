@@ -5,7 +5,7 @@ describe ProductVariantSync do
 
   before do
     ShopifyAPI::Base.activate_session(
-      ShopifyAPI::Session.new(shop.shopify_domain, shop.shopify_token)
+      ShopifyAPI::Session.new(domain: shop.shopify_domain, token: shop.shopify_token, api_version: ShopifyApp.configuration.api_version)
     )
   end
 

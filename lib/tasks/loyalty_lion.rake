@@ -21,7 +21,7 @@ namespace :loyalty_lion do
       {
         webhook: {
           topic: 'customers/update',
-          address: "#{Rails.application.secrets.website_url}/api/loyalty_lion/customer_updated?shop=#{shop_domain}&api_key=#{Rails.application.secrets.api_key}"
+          address: "#{Rails.application.credentials.website_url}/api/loyalty_lion/customer_updated?shop=#{shop_domain}&api_key=#{Rails.application.credentials.api_key}"
         }
       }.to_json,
       content_type: :json
@@ -43,12 +43,12 @@ namespace :loyalty_lion do
 
   def credentials
     [
-      Rails.application.secrets.loyalty_lion_api_token,
-      Rails.application.secrets.loyalty_lion_api_secret
+      Rails.application.credentials.loyalty_lion_api_token,
+      Rails.application.credentials.loyalty_lion_api_secret
     ].join(':')
   end
 
   def webhooks_api_url
-    "https://#{credentials}@#{Rails.application.secrets.loyalty_lion_api_url}/v2/webhooks"
+    "https://#{credentials}@#{Rails.application.credentials.loyalty_lion_api_url}/v2/webhooks"
   end
 end

@@ -1,7 +1,7 @@
 namespace :refund_webhook do
   desc 'Creates a webhook for refunds'
   task create: :environment do
-    webhook_url = File.join(Rails.application.secrets.website_url.to_s, 'api/webhooks')
+    webhook_url = File.join(Rails.application.credentials.website_url.to_s, 'api/webhooks')
 
     Shop.all.each do |shop|
       shop.with_shopify_session do

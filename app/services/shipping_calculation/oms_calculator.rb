@@ -7,8 +7,8 @@ module ShippingCalculation
     def initialize(country, items)
       @country = country
       @items = items
-      @api_key = Rails.application.secrets.oms_api_key
-      @api_base = Rails.application.secrets.oms_api_url
+      @api_key = Rails.application.credentials.oms_api_key
+      @api_base = Rails.application.credentials.oms_api_url
     end
 
     def call
@@ -22,7 +22,7 @@ module ShippingCalculation
       JSON.parse(resp.body)
     rescue RestClient::ExceptionWithResponse => e
       raise e if Rails.env.development?
-      Appsignal.set_error(e)
+      Sentry.capture_exception(e)
       false
     end
 

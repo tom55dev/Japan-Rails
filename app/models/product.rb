@@ -3,5 +3,5 @@ class Product < ApplicationRecord
 
   has_many :product_variants, dependent: :destroy
 
-  validates :remote_id, uniqueness: { scope: :shop_id }
+  validates :remote_id, uniqueness: { scope: :shop_id, case_sensitive: true }
 end

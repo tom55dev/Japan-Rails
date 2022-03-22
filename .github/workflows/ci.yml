@@ -6,7 +6,7 @@ jobs:
   test:
     name: RSpec Tests
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     services:
       redis:
@@ -18,9 +18,9 @@ jobs:
       RAILS_ENV: test
 
     steps:
-      - uses: actions/setup-ruby@v1
+      - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '2.4'
+          ruby-version: '2.7.2'
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
@@ -41,9 +41,6 @@ jobs:
         run: |
           gem install bundler:1.17.3
           bundle install --path=vendor/bundle --without=development
-
-      - name: Copy secrets.ci.yml
-        run: cp config/secrets.ci.yml config/secrets.yml
 
       - name: Database setup
         run: |
@@ -67,7 +64,7 @@ jobs:
           path: tmp/capybara
 
       - name: Publish test results
-        uses: binary-koan/action-junit-report@47fb54b
+        uses: binary-koan/action-junit-report@47fb54b52d79af3d4577d366b0059418cd7bbbfa
         if: always()
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

@@ -30,7 +30,7 @@ class ProductVariantSync
       sku:                variant.sku,
       position:           variant.position,
       grams:              variant.grams,
-      inventory_quantity: variant.inventory_quantity,
+      inventory_quantity: ShopifyAPI::InventoryLevel.where(inventory_item_ids: variant.inventory_item_id)&.first&.available || 0,
       inventory_policy:   variant.inventory_policy
     }
   end

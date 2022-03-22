@@ -3,7 +3,7 @@ require 'rails_helper'
 describe LoyaltyLion do
   let!(:shop) { create :shop }
   before do
-    ShopifyAPI::Base.activate_session(ShopifyAPI::Session.new(shop.shopify_domain, shop.shopify_token))
+    ShopifyAPI::Base.activate_session(ShopifyAPI::Session.new(domain: shop.shopify_domain, token: shop.shopify_token, api_version: ShopifyApp.configuration.api_version))
   end
 
   let!(:customer) { create :customer, remote_id: '123' }
@@ -77,7 +77,7 @@ describe LoyaltyLion do
       end
 
       before do
-        expect(RestClient).to receive(:get).with(/customers/, headers: { params: { email: customer.email } }).and_yield(response)
+        expect(RestClient).to receive(:get).with(/customers/).and_yield(response)
       end
 
       it 'updates the points from LoyaltyLion' do

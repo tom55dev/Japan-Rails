@@ -22,7 +22,7 @@ describe WishlistCreator do
   end
 
   before do
-    ShopifyAPI::Base.activate_session(ShopifyAPI::Session.new(shop.shopify_domain, shop.shopify_token))
+    ShopifyAPI::Base.activate_session(ShopifyAPI::Session.new(domain: shop.shopify_domain, token: shop.shopify_token, api_version: ShopifyApp.configuration.api_version))
 
     json = JSON.parse File.read('spec/fixtures/shopify_customer.json')
     object = ShopifyAPI::Customer.new(customer: json)

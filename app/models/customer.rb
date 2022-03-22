@@ -2,7 +2,7 @@ class Customer < ApplicationRecord
   belongs_to :shop
   has_many :rewards, dependent: :destroy
 
-  validates :remote_id, presence: true, uniqueness: { scope: :shop_id }
+  validates :remote_id, presence: true, uniqueness: { scope: :shop_id, case_sensitive: true }
 
   before_validation :strip_emoji
 
