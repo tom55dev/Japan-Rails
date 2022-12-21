@@ -72,7 +72,7 @@ describe RewardRedeemer do
         compare_at_price: 0,
         option1: /Reward #/,
         metafields: [
-          ShopifyAPI::Metafield.new(namespace: 'points_market', key: 'customer_id', value_type: 'integer', value: 123)
+          ShopifyAPI::Metafield.new(namespace: 'points_market', key: 'customer_id', type: 'integer', value: 123)
         ]
       })
 

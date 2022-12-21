@@ -10,8 +10,8 @@ describe StreaksCustomerAuthenticator do
   let!(:metafields) do
     shop.with_shopify_session do
       [
-        ShopifyAPI::Metafield.new(namespace: 'customer_portal', key: 'user_uuid', value: user_uuid, value_type: 'string'),
-        ShopifyAPI::Metafield.new(namespace: 'customer_portal', key: 'active_streak_count', value: active_streak_count, value_type: 'integer')
+        ShopifyAPI::Metafield.new(namespace: 'customer_portal', key: 'user_uuid', value: user_uuid, type: 'string'),
+        ShopifyAPI::Metafield.new(namespace: 'customer_portal', key: 'active_streak_count', value: active_streak_count, type: 'integer')
       ]
     end
   end

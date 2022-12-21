@@ -30,7 +30,7 @@ class SpecialOfferSyncJob < ApplicationJob
       namespace: 'japanhaul',
       key: 'special_offer',
       value: key_and_value,
-      value_type: 'string'
+      type: 'string'
     })
     special_offer.update(metafield_id: metafield.id)
   end

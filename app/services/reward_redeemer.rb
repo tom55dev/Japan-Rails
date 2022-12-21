@@ -164,7 +164,7 @@ class RewardRedeemer
     ShopifyAPI::Metafield.new({
       namespace: 'points_market',
       key: 'customer_id',
-      value_type: 'integer',
+      type: 'integer',
       value: customer_id
     })
   end
