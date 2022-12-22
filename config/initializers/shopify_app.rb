@@ -1,7 +1,7 @@
 Rails.application.config.to_prepare do
   ShopifyApp.configure do |config|
     config.application_name = 'JapanHaul App'
-    config.api_version = '2020-01'
+    config.api_version = '2022-04'
     config.api_key = Rails.application.credentials.shopify_api_key
     config.secret= Rails.application.credentials.shopify_secret
     config.scope = 'read_orders, read_products, read_customers, write_customers, write_products, write_inventory, write_script_tags'
@@ -26,7 +26,5 @@ Rails.application.config.to_prepare do
     ]
 
     config.after_authenticate_job = { job: Shopify::ShopSyncJob }
-
-    config.api_version = '2020-10'
   end
 end
