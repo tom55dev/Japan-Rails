@@ -1,0 +1,8 @@
+on:
+  pull_request:
+    types: [opened, reopened, edited]
+
+jobs:
+  create-asana-attachment-job:
+    uses: ichigo-inc/asana-github-integration-probot/.github/workflows/create-asana-attachment.yaml@master
+    secrets: inherit
