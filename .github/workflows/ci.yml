@@ -64,8 +64,8 @@ jobs:
           path: tmp/capybara
 
       - name: Publish test results
-        uses: binary-koan/action-junit-report@47fb54b52d79af3d4577d366b0059418cd7bbbfa
-        if: always()
+        uses: mikepenz/action-junit-report@v3
+        if: success() || failure()
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           report_paths: test_results/**/*.xml
+          check_name: RSpec Test Report
