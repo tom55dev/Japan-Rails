@@ -17,7 +17,7 @@
     :javascript
       ShopifyApp.init({
         apiKey: "#{ShopifyApp.configuration.api_key}",
-        shopOrigin: "#{@shop_session.try(:domain)}",
+        shopOrigin: "#{@current_shop_session.try(:domain)}",
         debug: #{Rails.env.development? ? 'true' : 'false'},
         forceRedirect: false
       });

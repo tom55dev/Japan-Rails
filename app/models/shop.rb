@@ -1,5 +1,5 @@
 class Shop < ActiveRecord::Base
-  include ShopifyApp::SessionStorage
+  include ShopifyApp::ShopSessionStorage
 
   has_many :products, dependent: :destroy
   has_many :product_variants, through: :products

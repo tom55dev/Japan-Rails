@@ -71,7 +71,7 @@ gem 'haml-rails', '~> 2.0'
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # Shopify APP
-gem 'shopify_app', '~> 12.0'
+gem 'shopify_app', '~> 18.1.2'
 
 # Background Job
 gem 'sidekiq', '~> 5.1'

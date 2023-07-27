@@ -40,11 +40,19 @@ Rails.application.routes.draw do
 
   get 'update_order_shipping', to: 'order_shipping#new'
 
-  root to: redirect('http://japanhaul.com')
+  if Rails.env.production?
+    root to: redirect('https://japanhaul.com')
+  else
+    root to: 'home#index'
+  end
 
   post '/api/webhooks/:type', to: 'api/webhooks#receive', as: :api_webhook
 
   mount ShopifyApp::Engine, at: Rails.application.credentials.encrypted_path.to_s
 
-  get '*path' => redirect('http://japanhaul.com')
+  if Rails.env.production?
+    get '*path' => redirect('https://japanhaul.com')
+  else
+    get '*path' => 'home#index'
+  end
 end

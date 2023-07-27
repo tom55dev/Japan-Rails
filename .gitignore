@@ -40,3 +40,10 @@ latest.dump
 
 /config/credentials/*.key
 !/config/credentials/test.key
+
+# IDE
+.idea/
+
+# Modules
+node_modules/
+vendor/bundle/

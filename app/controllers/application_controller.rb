@@ -4,6 +4,6 @@ class ApplicationController < ActionController::Base
   private
 
   def current_shop
-    @current_shop ||= Shop.find_by(shopify_domain: @shop_session.domain)
+    @current_shop ||= Shop.find_by(shopify_domain: @current_shopify_session.domain)
   end
 end
