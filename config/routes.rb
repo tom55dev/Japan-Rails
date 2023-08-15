@@ -20,10 +20,6 @@ Rails.application.routes.draw do
       post :remove
     end
 
-    scope '/loyalty_lion', controller: :loyalty_lion do
-      post :customer_updated
-    end
-
     scope '/contact', controller: :contact do
       post :create_ticket
     end
