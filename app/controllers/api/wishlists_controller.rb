@@ -7,6 +7,8 @@ class Api::WishlistsController < ApiController
   end
 
   def create
+    return render json: [], status: :ok #https://ichigo-inc.sentry.io/issues/4344154104/?project=5678417&referrer=asana_plugin
+
     creator = WishlistCreator.new(dynamic_params)
     wishlist = creator.call
 
