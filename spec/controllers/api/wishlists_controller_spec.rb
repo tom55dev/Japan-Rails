@@ -8,7 +8,7 @@ describe Api::WishlistsController do
           customer_id: 7034366034086,
           form_type: 'auto',
           product_ids: [7763739869350, 7760647028902],
-          shop: 'tokyotreat-shop.myshopify.com'
+          shop: 'japanhaul-staging.myshopify.com'
         }
       end
 
@@ -20,9 +20,5 @@ describe Api::WishlistsController do
         expect(response.body).to eq('[]')
       end
     end
-  end
-
-  describe '#destroy' do
-    it 'destroys the wishlist'
   end
 end
