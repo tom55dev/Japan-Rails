@@ -17,7 +17,8 @@ ENV BUNDLE_APP_CONFIG="/app/.bundle" \
 RUN apk --no-cache add bash build-base mariadb-dev nodejs tzdata && \
   rm -rf /var/cache/apk/*
 
-RUN gem update --system && gem install bundler:$BUNDLER_VERSION
+RUN gem i rubygems-update -v '<=3.4.22' && update_rubygems
+RUN gem install bundler:$BUNDLER_VERSION
 
 RUN mkdir -p /app
 RUN mkdir -p /app/tmp/pids
