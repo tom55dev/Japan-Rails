@@ -91,3 +91,5 @@ gem 'sentry-rails'
 # Rest client
 gem 'rest-client', '~> 2.0'
 gem 'countries', '1.2.2', require: 'countries/global'
+
+gem "emoji_regex", "~> 15.0"
